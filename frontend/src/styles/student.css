@@ -1,0 +1,47 @@
+/* Tailwind CSS Base Imports */
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+/* General profile card styling */
+.profile-card {
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Account profile card */
+.profile-card.account {
+  @apply border border-gray-200;
+  padding: 2rem;
+}
+
+.profile-card.account h2 {
+  @apply text-gray-900;
+}
+
+/* Sprint program card */
+.profile-card.internshipProgram {
+  @apply border border-gray-100;
+  padding: 1.5rem;
+  background-color: #0e0e0e; /* Very light background */
+}
+
+.profile-card.internshipProgram h2 {
+  @apply text-gray-700;
+}
+
+.profile-card.internshipProgram .internship-content {
+  @apply text-gray-500;
+}
+
+/* Sidebar Styling */
+
+.internshipProgram {
+  display: flex;
+  align-items: flex-start;
+}
+.internshipProgram img {
+  margin-left: 16px; /* Adjust spacing between image and content */
+}
+
