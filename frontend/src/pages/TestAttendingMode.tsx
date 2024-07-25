@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { fetchUserProfile, updateUserProfile, UserProfile } from '../services/userService';
 import '../styles/student.css'; // Import the custom styles
 import { CiLogout } from 'react-icons/ci';
@@ -10,7 +10,8 @@ import InternshipProgram from '../components/InternshipProgram';
 import NormInternship from '../components/NormInternship'; // Import NormInternship component
 import AccountDetails from '../components/AccountDetails';
 import AicteInternForm from '../components/AicteInternForm'; // Import AicteInternForm component
-import PaymentComponent from '../components/PaymentComponent'; // Import PaymentComponent
+import PaymentComponent from '../components/PaymentComponent';
+import FullCalendarComponent from '../components/FullCalendarComponent'; // Import the FullCalendarComponent
 
 // Custom event type
 type CustomChangeEvent = React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLTextAreaElement> | { target: { name: string; value: string | File | null; } };
@@ -21,9 +22,10 @@ const TestAttendingMode = () => {
   const [error, setError] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [editProfile, setEditProfile] = useState<UserProfile | null>(null);
-  const [activeSection, setActiveSection] = useState<'account' | 'internshipProgram' | 'normInternship' | 'aicteIntern' | 'payment'>('account');
+  const [activeSection, setActiveSection] = useState<'account' | 'internshipProgram' | 'normInternship' | 'aicteIntern' | 'payment' | 'calendar'>('account');
   const [isHelpOpen, setIsHelpOpen] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -49,6 +51,12 @@ const TestAttendingMode = () => {
 
     fetchProfile();
   }, []);
+
+  useEffect(() => {
+    if (location.pathname.includes('normInternship')) {
+      setActiveSection('normInternship');
+    }
+  }, [location.pathname]);
 
   const handleEdit = () => {
     setIsEditing(true);
@@ -78,7 +86,7 @@ const TestAttendingMode = () => {
     }
   };
 
-  const handleSidebarClick = (section: 'account' | 'internshipProgram' | 'normInternship' | 'aicteIntern' | 'payment') => {
+  const handleSidebarClick = (section: 'account' | 'internshipProgram' | 'normInternship' | 'aicteIntern' | 'payment' | 'calendar') => {
     setActiveSection(section);
   };
 
@@ -105,16 +113,22 @@ const TestAttendingMode = () => {
             onClick={() => handleSidebarClick('internshipProgram')}
             className={`w-full text-left p-2 mt-4 ${activeSection === 'internshipProgram' ? 'bg-lime-700' : 'bg-lime-800'} hover:bg-lime-600 rounded-md`}
           >
-            <span className="ml-2">Sprint Program</span>
+            <span className="ml-2">Sprint Internship Program</span>
           </button>
           <button
             onClick={() => handleSidebarClick('normInternship')}
             className={`w-full text-left p-2 mt-4 ${activeSection === 'normInternship' ? 'bg-lime-700' : 'bg-lime-800'} hover:bg-lime-600 rounded-md`}
           >
-            <span>Internship Program</span>
+            <span>Research Internship Program</span>
+          </button>
+          <button
+            onClick={() => handleSidebarClick('calendar')}
+            className={`w-full text-left p-2 mt-4 ${activeSection === 'calendar' ? 'bg-lime-700' : 'bg-lime-800'} hover:bg-lime-600 rounded-md`}
+          >
+            <span>Daily Logs</span>
           </button>
         </div>
-      </div>
+      </div>a
 
       <div className="flex-1 ml-64 p-6">
         <div className="flex justify-end items-center mb-6">
@@ -150,7 +164,7 @@ const TestAttendingMode = () => {
           {activeSection === 'internshipProgram' && (
             <div>
               <div className="flex justify-between items-center mb-6">
-                <h1 className="text-2xl font-bold text-black">Sprint Program</h1>
+                <h1 className="text-2xl font-bold text-black">Sprint Internship Program</h1>
                 <button
                   onClick={() => handleSidebarClick('payment')}
                   className="bg-lime-600 text-white font-semibold py-2 px-4 rounded hover:bg-lime-500 transition"
@@ -165,7 +179,7 @@ const TestAttendingMode = () => {
           {activeSection === 'normInternship' && (
             <>
               <div className="flex justify-between items-center mb-6">
-                <h1 className="text-2xl font-bold text-black">Internship Program</h1>
+                <h1 className="text-2xl font-bold text-black">Research Internship Program</h1>
                 <button
                   onClick={() => handleDynamicRoute(userProfile?.id || '')}
                   className="bg-lime-600 text-white font-semibold py-2 px-4 rounded hover:bg-lime-500 transition"
@@ -175,34 +189,27 @@ const TestAttendingMode = () => {
                 </button>
               </div>
               <NormInternship />
+              
             </>
           )}
-          {activeSection === 'aicteIntern' && (
-            <AicteInternForm />
-          )}
-          {activeSection === 'payment' && (
-            <PaymentComponent />
-          )}
+          {activeSection === 'aicteIntern' && <AicteInternForm />}
+          {activeSection === 'payment' && <PaymentComponent />}
+          {activeSection === 'calendar' && <FullCalendarComponent />} {/* Render FullCalendarComponent */}
         </div>
       </div>
 
       {isHelpOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-          <div className="bg-white p-6 rounded-lg shadow-lg relative w-3/4 max-w-lg">
+        <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-75">
+          <div className="bg-white p-6 rounded-lg shadow-lg relative">
             <button
               onClick={() => setIsHelpOpen(false)}
-              className="absolute top-2 right-2 bg-gray-200 hover:bg-gray-300 rounded-full p-2"
-              aria-label="Close"
+              className="absolute top-2 right-2 text-gray-500 hover:text-gray-800"
+              aria-label="Close Help"
             >
-              <AiOutlineClose size={24} />
+              <AiOutlineClose size={20} />
             </button>
-            <h2 className="text-xl font-bold mb-4">Help</h2>
-            <p className="text-gray-700">For assistance, you can contact:</p>
-            <p className="text-gray-700 mt-2">
-              <strong>Sprint Representative</strong><br />
-              Email: <a href="mailto:directoracademic@iimstc.com" className="text-blue-500 hover:underline">directoracademic@iimstc.com</a> / <a href="mailto:aiimscouncil@gmail.com" className="text-blue-500 hover:underline">aiimscouncil@gmail.com</a><br />
-              Phone: <a href="tel:+918553440530" className="text-blue-500 hover:underline">+918553440530</a> / <a href="tel:+918197943343" className="text-blue-500 hover:underline">+918197943343</a> / <a href="tel:+917829520894" className="text-blue-500 hover:underline">+917829520894</a>
-            </p>
+            <h2 className="text-lg font-bold mb-4">Help & Support</h2>
+            <p className="text-gray-700">Here you can find help and support for various issues and questions. Contact us if you need further assistance.</p>
           </div>
         </div>
       )}
@@ -211,4 +218,3 @@ const TestAttendingMode = () => {
 };
 
 export default TestAttendingMode;
-

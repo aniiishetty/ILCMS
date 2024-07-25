@@ -6,6 +6,8 @@ import TestAttendingMode from './pages/TestAttendingMode';
 import FetchUserPhoto from './pages/FetchUserPhoto';
 import AicteInternForm from './components/AicteInternForm';
 
+import DailyLogForm from './pages/DailyLogForm';
+
 
  // Corrected import
 
@@ -19,6 +21,8 @@ const App: React.FC = () => {
           <Route path="/user" element={<TestAttendingMode />} />
           <Route path="/aicteIntern/:userId" element={<AicteInternForm />} />
           <Route path="/photos" element={<FetchUserPhoto />} />
+          
+          <Route path="/dailyLog" element={<DailyLogForm />} />
         
           
         </Routes>

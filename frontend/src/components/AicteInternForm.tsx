@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { fetchUserDetails } from '../services/userService';
-import { createAicteIntern } from '../services/aicteInternService';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 
 const AicteInternForm: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -25,9 +24,15 @@ const AicteInternForm: React.FC = () => {
     technicalSkills: '',
     internshipActivities: '',
     evidenceToFaculty: '',
+    email: '',  // Add email field
+    phoneNumber: '',  // Add phoneNumber field
+    fullName: '', 
   });
 
+  const [alertMessage, setAlertMessage] = useState<string | null>(null);
+
   const { userId } = useParams<{ userId?: string }>();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (userId) {
@@ -43,6 +48,9 @@ const AicteInternForm: React.FC = () => {
             semester: user.semester,
             academicYear: user.academicYear,
             schoolName: user.collegeName,
+            email: user.email,
+            phoneNumber: user.phoneNumber,
+            fullName: user.name
           }));
         })
         .catch(error => {
@@ -74,32 +82,14 @@ const AicteInternForm: React.FC = () => {
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-
-    const formDataToSubmit = new FormData();
-
-    Object.keys(formData).forEach(key => {
-      const value = formData[key as keyof typeof formData];
-
-      if (value !== null) {
-        if (key === 'resume' && value instanceof File) {
-          formDataToSubmit.append(key, value);
-        } else {
-          formDataToSubmit.append(key, String(value));
-        }
-      }
-    });
-
-    try {
-      console.log('Submitting form data:', Array.from(formDataToSubmit.entries()));
-      const response = await createAicteIntern(formDataToSubmit);
-      console.log('Form submitted successfully:', response);
-      alert('Application submitted successfully.');
-    } catch (error) {
-      console.error('Error submitting form:', error);
-      alert('Failed to submit application. Please try again later.');
-    }
+    console.log('Form data:', formData);
+    setAlertMessage('Form submitted successfully.');
+    setTimeout(() => {
+      setAlertMessage(null);
+      navigate('/calendar');
+    }, 3000);
   };
 
   return (
@@ -110,6 +100,46 @@ const AicteInternForm: React.FC = () => {
       </div>
       <form onSubmit={handleSubmit}>
         <div className="grid grid-cols-1 gap-4">
+        <div className="form-group">
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email</label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
+              required
+            />
+          </div>
+
+          {/* Phone Number */}
+          <div className="form-group">
+            <label htmlFor="phoneNumber" className="block text-sm font-medium text-gray-700">Phone Number</label>
+            <input
+              type="text"
+              id="phoneNumber"
+              name="phoneNumber"
+              value={formData.phoneNumber}
+              onChange={handleChange}
+              className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
+              required
+            />
+          </div>
+
+          {/* Full Name */}
+          <div className="form-group">
+            <label htmlFor="fullName" className="block text-sm font-medium text-gray-700">Full Name</label>
+            <input
+              type="text"
+              id="fullName"
+              name="fullName"
+              value={formData.fullName}
+              onChange={handleChange}
+              className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
+              required
+            />
+          </div>
           {/* Home Address */}
           <div className="form-group">
             <label htmlFor="homeAddress" className="block text-sm font-medium text-gray-700">Home Address</label>

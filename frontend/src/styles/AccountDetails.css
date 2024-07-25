@@ -1,0 +1,106 @@
+/* AccountDetails.css */
+.container {
+    padding: 1.5rem;
+    max-width: 48rem;
+    margin: 0 auto;
+    background-color: white;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 0.5rem;
+}
+
+.title {
+    font-size: 1.875rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    color: #2d3748;
+}
+
+.inputGroup {
+    margin-bottom: 1rem;
+}
+
+.label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #4a5568;
+}
+
+.input,
+.textarea {
+    width: 100%;
+    border: 1px solid #cbd5e0;
+    border-radius: 0.375rem;
+    padding: 0.5rem 0.75rem;
+    margin-top: 0.25rem;
+}
+
+.imgPreview {
+    width: 8rem;
+    height: 8rem;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 1px solid #cbd5e0;
+}
+
+.buttonGroup {
+    margin-top: 1.5rem;
+    display: flex;
+    gap: 1rem;
+}
+
+.buttonSave {
+    background-color: #4299e1;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 0.375rem;
+}
+
+.buttonCancel {
+    background-color: #718096;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 0.375rem;
+}
+
+.fieldGroup {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.fieldGroup img {
+    margin-top: 0.5rem;
+}
+
+.viewGroup {
+    margin-top: 1rem;
+    border-collapse: collapse;
+    width: 100%;
+}
+
+.viewGroup table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.viewGroup th,
+.viewGroup td {
+    padding: 0.75rem;
+    border: 1px solid #cbd5e0;
+    text-align: left;
+}
+
+.viewGroup th {
+    background-color: #f7fafc;
+    color: #2d3748;
+}
+
+.viewGroup td {
+    background-color: white;
+    color: #4a5568;
+}
+
+.viewGroup img {
+    margin-top: 0.5rem;
+}
