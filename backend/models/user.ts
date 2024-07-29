@@ -126,9 +126,9 @@ User.init(
     tableName: 'users',
     indexes: [
       {
-        unique: true,
-        fields: ['email', 'usn'] // Create a composite index on email and usn
-      }
+      unique: true,
+      fields: ['email']
+      },
     ]
   }
 );

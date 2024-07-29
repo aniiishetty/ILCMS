@@ -19,11 +19,16 @@ const authRoutes_1 = __importDefault(require("./routes/authRoutes"));
 const userRoutes_1 = __importDefault(require("./routes/userRoutes"));
 const models_1 = require("./models");
 const body_parser_1 = __importDefault(require("body-parser"));
+const path_1 = __importDefault(require("path"));
 const studentPhotoRoutes_1 = __importDefault(require("./routes/studentPhotoRoutes"));
 const aicteInternRoutes_1 = __importDefault(require("./routes/aicteInternRoutes"));
 dotenv_1.default.config();
 const app = (0, express_1.default)();
 const port = process.env.PORT || 5000;
+app.use(express_1.default.static(path_1.default.join(__dirname, "/Web/build")));
+app.get("/", (req, res) => {
+    res.sendFile(path_1.default.join(__dirname + "/Web/build/index.html"));
+});
 // Use CORS middleware
 app.use((0, cors_1.default)({
     origin: '*',
@@ -38,7 +43,7 @@ app.use(express_1.default.json());
 app.use('/api/auth', authRoutes_1.default);
 app.use('/api/users', userRoutes_1.default);
 app.use('/api/photos', studentPhotoRoutes_1.default);
-app.use('/api/aicte', aicteInternRoutes_1.default);
+app.use('/api/aicte-interns', aicteInternRoutes_1.default);
 app.listen(port, () => __awaiter(void 0, void 0, void 0, function* () {
     console.log(`Server running on port ${port}`);
     yield (0, models_1.connectDB)();

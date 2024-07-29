@@ -34,7 +34,7 @@ app.use(express.json());
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/photos', studentPhotoRoutes);
-app.use('/api/aicte',aicteInternRoutes);
+app.use('/api/aicte-interns', aicteInternRoutes);
 
 app.listen(port, async () => {
   console.log(`Server running on port ${port}`);

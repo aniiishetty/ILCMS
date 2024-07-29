@@ -9,7 +9,7 @@ import { IoMdHelpCircleOutline } from 'react-icons/io'; // Import the help icon
 import InternshipProgram from '../components/InternshipProgram';
 import NormInternship from '../components/NormInternship'; // Import NormInternship component
 import AccountDetails from '../components/AccountDetails';
-import AicteInternForm from '../components/AicteInternForm'; // Import AicteInternForm component
+import AICTE from '../components/AICTE'; // Import AicteInternForm component
 import PaymentComponent from '../components/PaymentComponent';
 import FullCalendarComponent from '../components/FullCalendarComponent'; // Import the FullCalendarComponent
 
@@ -90,67 +90,72 @@ const TestAttendingMode = () => {
     setActiveSection(section);
   };
 
-  const handleDynamicRoute = (userId: string) => {
-    navigate(`/aicteIntern/${userId}`);
-  };
 
   return (
-    <div className="flex">
-      <div className="sidebar bg-lime-800 text-white w-64 transition-all duration-300 flex flex-col p-4 fixed h-full">
-        <div className="flex flex-col items-center">
-          <div className="w-24 h-24 flex items-center justify-center bg-lime-600 rounded-full mb-4">
-            <AiOutlineUser size={40} className="text-white" />
-          </div>
-          <h2 className="text-xl font-bold text-gray-100 mb-2">Hi, {userProfile?.name}</h2>
-          <button
-            onClick={() => handleSidebarClick('account')}
-            className={`w-full text-left p-2 mt-4 ${activeSection === 'account' ? 'bg-lime-700' : 'bg-lime-800'} hover:bg-lime-600 rounded-md`}
-          >
-            <MdAccountBox size={24} className="inline mr-2" />
-            Account
-          </button>
-          <button
-            onClick={() => handleSidebarClick('internshipProgram')}
-            className={`w-full text-left p-2 mt-4 ${activeSection === 'internshipProgram' ? 'bg-lime-700' : 'bg-lime-800'} hover:bg-lime-600 rounded-md`}
-          >
-            <span className="ml-2">Sprint Internship Program</span>
-          </button>
-          <button
-            onClick={() => handleSidebarClick('normInternship')}
-            className={`w-full text-left p-2 mt-4 ${activeSection === 'normInternship' ? 'bg-lime-700' : 'bg-lime-800'} hover:bg-lime-600 rounded-md`}
-          >
-            <span>Research Internship Program</span>
-          </button>
-          <button
-            onClick={() => handleSidebarClick('calendar')}
-            className={`w-full text-left p-2 mt-4 ${activeSection === 'calendar' ? 'bg-lime-700' : 'bg-lime-800'} hover:bg-lime-600 rounded-md`}
-          >
-            <span>Daily Logs</span>
-          </button>
-        </div>
-      </div>a
+    <div className="relative flex">
+      {/* Logo positioned absolutely at the top right */}
+      <img 
+        src="https://iimstc.com/wp-content/uploads/2021/10/log.png" 
+        alt="Logo" 
+        className="absolute top-4 right-4 w-30 h-20" 
+      />
 
-      <div className="flex-1 ml-64 p-6">
-        <div className="flex justify-end items-center mb-6">
-          <div className="flex items-center space-x-4">
+      <div className="sidebar bg-lime-800 text-white w-64 transition-all duration-300 flex flex-col p-4 fixed h-full z-10">
+        <div className="flex flex-col items-center flex-1">
+          <div className="flex flex-col flex-1">
+            <div className="w-24 h-24 flex items-center justify-center bg-lime-600 rounded-full mb-4">
+              <AiOutlineUser size={40} className="text-white" />
+            </div>
+            <h2 className="text-xl font-bold text-gray-100 mb-2">Hi, {userProfile?.name}</h2>
             <button
-              onClick={() => setIsHelpOpen(true)}
-              className="bg-gray-800 text-white font-semibold py-2 px-4 rounded hover:bg-gray-700 transition"
-              aria-label="Help"
+              onClick={() => handleSidebarClick('account')}
+              className={`w-full text-left p-2 mt-4 ${activeSection === 'account' ? 'bg-lime-700' : 'bg-lime-800'} hover:bg-lime-600 rounded-md`}
             >
-              <IoMdHelpCircleOutline size={24} />
+              <MdAccountBox size={24} className="inline mr-2" />
+              Account
             </button>
             <button
-              onClick={handleLogout}
-              className="bg-red-600 text-white font-semibold p-2 rounded hover:bg-red-500 transition"
-              aria-label="Logout"
+              onClick={() => handleSidebarClick('internshipProgram')}
+              className={`w-full text-left p-2 mt-4 ${activeSection === 'internshipProgram' ? 'bg-lime-700' : 'bg-lime-800'} hover:bg-lime-600 rounded-md`}
             >
-              <CiLogout size={24} />
+              <span className="ml-2">Sprint Internship Program</span>
+            </button>
+            <button
+              onClick={() => handleSidebarClick('normInternship')}
+              className={`w-full text-left p-2 mt-4 ${activeSection === 'normInternship' ? 'bg-lime-700' : 'bg-lime-800'} hover:bg-lime-600 rounded-md`}
+            >
+              <span>Research Internship Program</span>
+            </button>
+            <button
+              onClick={() => handleSidebarClick('calendar')}
+              className={`w-full text-left p-2 mt-4 ${activeSection === 'calendar' ? 'bg-lime-700' : 'bg-lime-800'} hover:bg-lime-600 rounded-md`}
+            >
+              <span>Daily Logs</span>
             </button>
           </div>
+          <div className="mt-auto">
+            <div className="flex justify-center mb-4">
+              <button
+                onClick={() => setIsHelpOpen(true)}
+                className="bg-gray-800 text-white font-semibold py-2 px-4 rounded hover:bg-gray-700 transition"
+                aria-label="Help"
+              >
+                <IoMdHelpCircleOutline size={24} />
+              </button>
+              <button
+                onClick={handleLogout}
+                className="bg-red-600 text-white font-semibold p-2 rounded hover:bg-red-500 transition ml-4"
+                aria-label="Logout"
+              >
+                <CiLogout size={24} />
+              </button>
+            </div>
+          </div>
         </div>
+      </div>
 
-        <div className="bg-white p-4 rounded-lg shadow-lg">
+      <div className="flex-1 ml-64 pt-24 p-6">
+        <div>
           {activeSection === 'account' && userProfile && (
             <AccountDetails
               userProfile={userProfile}
@@ -181,7 +186,7 @@ const TestAttendingMode = () => {
               <div className="flex justify-between items-center mb-6">
                 <h1 className="text-2xl font-bold text-black">Research Internship Program</h1>
                 <button
-                  onClick={() => handleDynamicRoute(userProfile?.id || '')}
+                onClick={() => handleSidebarClick('aicteIntern')}
                   className="bg-lime-600 text-white font-semibold py-2 px-4 rounded hover:bg-lime-500 transition"
                   aria-label="Enroll Now"
                 >
@@ -189,27 +194,32 @@ const TestAttendingMode = () => {
                 </button>
               </div>
               <NormInternship />
-              
             </>
           )}
-          {activeSection === 'aicteIntern' && <AicteInternForm />}
+           {activeSection === 'aicteIntern' && userProfile && (
+            <div className="flex justify-center">
+              <div className="w-full max-w-4xl"> {/* Increased max-width */}
+                <AICTE userId={Number(userProfile.id)} />
+              </div>
+            </div>
+          )}
           {activeSection === 'payment' && <PaymentComponent />}
-          {activeSection === 'calendar' && <FullCalendarComponent />} {/* Render FullCalendarComponent */}
+          {activeSection === 'calendar' && <FullCalendarComponent />}
         </div>
       </div>
 
       {isHelpOpen && (
-        <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-75">
-          <div className="bg-white p-6 rounded-lg shadow-lg relative">
-            <button
-              onClick={() => setIsHelpOpen(false)}
-              className="absolute top-2 right-2 text-gray-500 hover:text-gray-800"
-              aria-label="Close Help"
-            >
-              <AiOutlineClose size={20} />
-            </button>
-            <h2 className="text-lg font-bold mb-4">Help & Support</h2>
-            <p className="text-gray-700">Here you can find help and support for various issues and questions. Contact us if you need further assistance.</p>
+        <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-75 z-50">
+          <div className="bg-white p-6 rounded-md shadow-md max-w-md mx-auto">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-bold">Help</h2>
+              <button onClick={() => setIsHelpOpen(false)} aria-label="Close">
+                <AiOutlineClose size={24} />
+              </button>
+            </div>
+            <p className="text-gray-700 mb-4">
+              For support, please contact our help desk at support@example.com or call us at 1-800-123-4567.
+            </p>
           </div>
         </div>
       )}

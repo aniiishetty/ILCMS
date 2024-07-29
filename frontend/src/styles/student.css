@@ -45,3 +45,8 @@
   margin-left: 16px; /* Adjust spacing between image and content */
 }
 
+.aicteIntern-container {
+  width: 100%;
+  max-width: 1200px; /* Adjust width as needed */
+  margin: 0 auto;
+}

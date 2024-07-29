@@ -89,7 +89,7 @@ User.init({
     indexes: [
         {
             unique: true,
-            fields: ['email', 'usn'] // Create a composite index on email and usn
-        }
+            fields: ['email']
+        },
     ]
 });

@@ -57,6 +57,10 @@ const User: React.FC = () => {
         phoneNumber,
       };
       await userRegister(userDetails);
+    } catch (err) {
+      setError('');
+    } finally {
+      // Always switch to login mode and clear form fields
       setMode('user-login');
       setUsername('');
       setPassword('');
@@ -72,15 +76,11 @@ const User: React.FC = () => {
       setBranch('');
       setSemester('');
       setPhoneNumber('');
-      setError(null);
-    } catch (err) {
-      setError('Registration failed');
     }
   };
 
   return (
     <div className="container">
-      <img src="https://iimstc.com/wp-content/uploads/2021/10/log.png" alt="Logo" className="absolute top-4 right-4 w-29 h-20" />
       <div className="background"></div>
       <div className="form-container">
         {mode === 'user-login' ? (

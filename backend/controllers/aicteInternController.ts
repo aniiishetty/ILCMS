@@ -1,74 +1,67 @@
 import { Request, Response } from 'express';
 import { AicteIntern } from '../models/aicteIntern';
-import { User } from '../models/user';
-import multer from 'multer';
 
-const storage = multer.memoryStorage();
-const upload = multer({ storage });
-
-const createAicteIntern = async (req: Request, res: Response) => {
+// Create a new AICTE Intern
+export const createAicteIntern = async (req: Request, res: Response) => {
   try {
-    // Log the incoming request body
-    console.log('Request body:', req.body);
+    const {
+      email,
+      phoneNumber,
+      fullName,
+      homeAddress,
+      rollNumber,
+      academicConcentration,
+      overallGPA,
+      semester,
+      academicYear,
+      schoolName,
+      schoolCityState,
+      campusAddress,
+      campusPhoneNumber,
+      campusFaxNumber,
+      schoolEmail,
+      hodName,
+      hodEmail,
+      internshipPreferences,
+      learningObjectives,
+      technicalSkills,
+      internshipActivities,
+      evidenceToFaculty,
+      userId,
+    } = req.body;
 
-    const { userId, ...data } = req.body;
+    const resume = req.file ? req.file.buffer : null;
 
-    // Log the userId and any additional data
-    console.log('Received userId:', userId);
-    console.log('Additional data:', data);
-
-    // Fetch user details
-    console.log('Attempting to find user by ID...');
-    const user = await User.findByPk(userId);
-    if (!user) {
-      console.error('User not found with ID:', userId);
-      return res.status(404).json({ success: false, message: 'User not found' });
-    }
-
-    console.log('User found:', user);
-
-    // Get the resume as a Buffer
-    const resume = req.file?.buffer;
-
-    // Log the resume buffer status
-    if (resume) {
-      console.log('Resume uploaded successfully, size:', resume.length);
-    } else {
-      console.log('No resume file uploaded');
-    }
-
-    // Log the data to be saved
-    console.log('Data to be saved to AicteIntern:', {
-      ...data,
-      userId: user.id,
-      email: user.email,
-      phoneNumber: user.phoneNumber,
-      fullName: user.name,
-      resume
-    });
-
-    // Create AicteIntern entry
-    console.log('Attempting to create AicteIntern entry...');
     const aicteIntern = await AicteIntern.create({
-      ...data,
-      userId: user.id,
-      email: user.email, // Use user details to populate fields
-      phoneNumber: user.phoneNumber,
-      fullName: user.name,
+      email,
+      phoneNumber,
+      fullName,
+      homeAddress,
+      rollNumber,
+      academicConcentration,
+      overallGPA,
+      semester,
+      academicYear,
+      schoolName,
+      schoolCityState,
+      campusAddress,
+      campusPhoneNumber,
+      campusFaxNumber,
+      schoolEmail,
+      hodName,
+      hodEmail,
       resume,
+      internshipPreferences,
+      learningObjectives,
+      technicalSkills,
+      internshipActivities,
+      evidenceToFaculty,
+      userId,
     });
 
-    console.log('AicteIntern created successfully:', aicteIntern);
-
-    res.status(201).json({ success: true, aicteIntern });
+    return res.status(201).json(aicteIntern);
   } catch (error) {
-    console.error('Error creating AicteIntern:');
-    console.error('Error message:', error instanceof Error ? error.message : 'Unknown error');
-    if (error instanceof Error) {
-      console.error('Stack trace:', error.stack);
-    }
-    res.status(500).json({ success: false, message: 'Internal server error' });
+    console.error('Error creating AICTE Intern:', error);
+    return res.status(500).json({ error: 'Internal Server Error' });
   }
 };
-
-export { createAicteIntern };

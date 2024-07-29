@@ -7,6 +7,8 @@ const express_1 = __importDefault(require("express"));
 const multer_1 = __importDefault(require("multer"));
 const aicteInternController_1 = require("../controllers/aicteInternController");
 const router = express_1.default.Router();
-const upload = (0, multer_1.default)();
-router.post('/aicte-interns', upload.single('resume'), aicteInternController_1.createAicteIntern);
+// Setup multer for handling file uploads
+const upload = (0, multer_1.default)({ storage: multer_1.default.memoryStorage() });
+// Route to handle AICTE Intern form submission
+router.post('/create', upload.single('resume'), aicteInternController_1.createAicteIntern);
 exports.default = router;

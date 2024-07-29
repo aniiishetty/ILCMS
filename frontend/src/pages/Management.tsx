@@ -39,11 +39,16 @@ const Management: React.FC = () => {
   };
 
   return (
+    
     <div className="container">
+      
       <div className="background"></div>
+      
       <div className="form-container">
+        
         {mode === 'admin-login' ? (
           <div>
+            
             <h2 className="title">Management Login</h2>
             <form className="form" onSubmit={handleLoginSubmit}>
               {error && <p className="error">{error}</p>}
