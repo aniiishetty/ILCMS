@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createAicteIntern = void 0;
+exports.getAicteInternById = exports.createAicteIntern = void 0;
 const aicteIntern_1 = require("../models/aicteIntern");
 // Create a new AICTE Intern
 const createAicteIntern = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -50,3 +50,23 @@ const createAicteIntern = (req, res) => __awaiter(void 0, void 0, void 0, functi
     }
 });
 exports.createAicteIntern = createAicteIntern;
+const getAicteInternById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { id } = req.params;
+        console.log(`Fetching AICTE Intern with ID: ${id}`); // Logging the ID being fetched
+        const aicteIntern = yield aicteIntern_1.AicteIntern.findByPk(id, {
+            attributes: ['hodName', 'hodEmail'] // Specify the fields to return
+        });
+        if (!aicteIntern) {
+            console.log(`AICTE Intern with ID ${id} not found`); // Log if the intern is not found
+            return res.status(404).json({ error: 'AICTE Intern not found' });
+        }
+        console.log(`Fetched AICTE Intern: ${JSON.stringify(aicteIntern)}`); // Log the fetched intern data
+        return res.status(200).json(aicteIntern);
+    }
+    catch (error) {
+        console.error('Error retrieving AICTE Intern:', error);
+        return res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+exports.getAicteInternById = getAicteInternById;

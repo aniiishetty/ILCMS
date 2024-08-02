@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 import { UserProfile } from '../services/userService';
 import '../styles/AccountDetails.css';
 
@@ -8,16 +9,11 @@ const isBuffer = (photo: any): photo is { type: 'Buffer'; data: number[] } =>
   photo && photo.type === 'Buffer' && Array.isArray(photo.data);
 
 interface AccountDetailsProps {
-  userProfile: UserProfile | null;
+  userProfile: UserProfile;
   isEditing: boolean;
   editProfile: UserProfile | null;
-  handleChange: (
-    e:
-      | React.ChangeEvent<HTMLInputElement>
-      | React.ChangeEvent<HTMLTextAreaElement>
-      | { target: { name: string; value: string | File | null } }
-  ) => void;
-  handleSave: () => void;
+  handleChange: (e: React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLTextAreaElement>) => void;
+  handleSave: () => Promise<void>;
   handleEdit: () => void;
 }
 
@@ -41,14 +37,33 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
   handleSave,
   handleEdit,
 }) => {
+  const [currentProfile, setCurrentProfile] = useState<UserProfile | null>(userProfile);
+
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      try {
+        const response = await axios.post('/api/users/profile', { IIMSTC_ID: userProfile.IIMSTC_ID });
+        if (response.data.success) {
+          setCurrentProfile(response.data.user);
+        } else {
+          console.error('Failed to fetch user profile');
+        }
+      } catch (error) {
+        console.error('Error fetching user profile:', error);
+      }
+    };
+
+    fetchUserProfile();
+  }, [userProfile.IIMSTC_ID]);
+
   const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     const formattedValue = name === 'dob' ? convertToInputDateFormat(value) : value;
     handleChange({ target: { name, value: formattedValue } } as React.ChangeEvent<HTMLInputElement>);
   };
 
-  const renderPassportPhoto = (passportPhoto: File | { type: 'Buffer'; data: Uint8Array } | null | undefined) => {
-    if (passportPhoto === null || passportPhoto === undefined) {
+  const renderPassportPhoto = (passportPhoto: File | { type: 'Buffer'; data: number[] } | null | undefined) => {
+    if (!passportPhoto) {
       return 'No photo available';
     }
 
@@ -57,29 +72,15 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
       reader.onloadend = () => {
         const dataUrl = reader.result as string;
         if (dataUrl) {
-          return (
-            <img
-              src={dataUrl}
-              alt="Passport Photo Preview"
-              className="imgPreview"
-            />
-          );
-        } else {
-          return 'No photo available';
+          return <img src={dataUrl} alt="Passport Photo Preview" className="imgPreview" />;
         }
       };
       reader.readAsDataURL(passportPhoto);
-      return null;
+      return null; // The image will be displayed once FileReader finishes loading
     } else if (isBuffer(passportPhoto)) {
       const base64String = btoa(String.fromCharCode(...passportPhoto.data));
       const dataUrl = `data:image/jpeg;base64,${base64String}`;
-      return (
-        <img
-          src={dataUrl}
-          alt="Passport Photo Preview"
-          className="imgPreview"
-        />
-      );
+      return <img src={dataUrl} alt="Passport Photo Preview" className="imgPreview" />;
     } else {
       return 'No photo available';
     }
@@ -88,7 +89,7 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
   return (
     <div className="container">
       <h2 className="title">Account Details</h2>
-      {userProfile ? (
+      {currentProfile ? (
         isEditing ? (
           <div className="space-y-4">
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -98,31 +99,26 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
                   id="email"
                   type="email"
                   name="email"
-                  value={editProfile?.email || ''}
+                  value={editProfile?.IIMSTC_ID || ''}
                   onChange={handleChange}
                   placeholder="Email"
-                  className="input"
+                  className="input text-black"
                   aria-label="Email"
                 />
               </div>
 
-              <div className="fieldGroup">
-                <div className="flex-shrink-0">
-                  <label className="label" htmlFor="dob">Date of Birth:</label>
-                  <input
-                    id="dob"
-                    type="date"
-                    name="dob"
-                    value={editProfile?.dob ? convertToInputDateFormat(editProfile.dob) : ''}
-                    onChange={handleDateChange}
-                    placeholder="Date of Birth"
-                    className="input"
-                    aria-label="Date of Birth"
-                  />
-                </div>
-                <div className="flex-1 mt-2">
-                  {renderPassportPhoto(editProfile?.passportPhoto)}
-                </div>
+              <div className="inputGroup">
+                <label className="label" htmlFor="dob">Date of Birth:</label>
+                <input
+                  id="dob"
+                  type="date"
+                  name="dob"
+                  value={editProfile?.dob ? convertToInputDateFormat(editProfile.dob) : ''}
+                  onChange={handleDateChange}
+                  placeholder="Date of Birth"
+                  className="input text-black"
+                  aria-label="Date of Birth"
+                />
               </div>
 
               <div className="inputGroup">
@@ -134,7 +130,7 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
                   value={editProfile?.address || ''}
                   onChange={handleChange}
                   placeholder="Address"
-                  className="input"
+                  className="input text-black"
                   aria-label="Address"
                 />
               </div>
@@ -148,7 +144,7 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
                   value={editProfile?.name || ''}
                   onChange={handleChange}
                   placeholder="Full Name"
-                  className="input"
+                  className="input text-black"
                   aria-label="Full Name"
                 />
               </div>
@@ -162,7 +158,7 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
                   value={editProfile?.phoneNumber || ''}
                   onChange={handleChange}
                   placeholder="Phone Number"
-                  className="input"
+                  className="input text-black"
                   aria-label="Phone Number"
                 />
               </div>
@@ -176,22 +172,36 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
                   value={editProfile?.collegeName || ''}
                   onChange={handleChange}
                   placeholder="College Name"
-                  className="input"
+                  className="input text-black"
                   aria-label="College Name"
                 />
               </div>
 
               <div className="inputGroup">
-                <label className="label" htmlFor="university">University:</label>
+                <label className="label" htmlFor="branch">Branch:</label>
                 <input
-                  id="university"
+                  id="branch"
                   type="text"
-                  name="university"
-                  value={editProfile?.university || ''}
+                  name="branch"
+                  value={editProfile?.branch || ''}
                   onChange={handleChange}
-                  placeholder="University"
-                  className="input"
-                  aria-label="University"
+                  placeholder="Branch"
+                  className="input text-black"
+                  aria-label="Branch"
+                />
+              </div>
+
+              <div className="inputGroup">
+                <label className="label" htmlFor="semester">Semester:</label>
+                <input
+                  id="semester"
+                  type="text"
+                  name="semester"
+                  value={editProfile?.semester || ''}
+                  onChange={handleChange}
+                  placeholder="Semester"
+                  className="input text-black"
+                  aria-label="Semester"
                 />
               </div>
 
@@ -204,7 +214,7 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
                   value={editProfile?.usn || ''}
                   onChange={handleChange}
                   placeholder="USN"
-                  className="input"
+                  className="input text-black"
                   aria-label="USN"
                 />
               </div>
@@ -218,115 +228,71 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
                   value={editProfile?.verificationType || ''}
                   onChange={handleChange}
                   placeholder="Verification Type"
-                  className="input"
+                  className="input text-black"
                   aria-label="Verification Type"
                 />
               </div>
-
-              <div className="inputGroup">
-                <label className="label" htmlFor="verificationId">Verification ID:</label>
-                <input
-                  id="verificationId"
-                  type="text"
-                  name="verificationId"
-                  value={editProfile?.verificationId || ''}
-                  onChange={handleChange}
-                  placeholder="Verification ID"
-                  className="input"
-                  aria-label="Verification ID"
-                />
-              </div>
-
-              <div className="inputGroup">
-                <label className="label" htmlFor="passportPhoto">Student Photo:</label>
-                <input
-                  id="passportPhoto"
-                  type="file"
-                  name="passportPhoto"
-                  onChange={(e) =>
-                    handleChange({
-                      target: {
-                        name: 'passportPhoto',
-                        value: e.target.files ? e.target.files[0] : null,
-                      },
-                    })
-                  }
-                  className="input"
-                  aria-label="Passport Photo"
-                />
-              </div>
             </div>
-
-            <div className="buttonGroup">
-              <button onClick={handleSave} className="buttonSave">
-                Save
-              </button>
-              <button onClick={handleEdit} className="buttonCancel">
-                Cancel
-              </button>
-            </div>
+            <button onClick={handleSave} className="saveButton">Save</button>
           </div>
         ) : (
-          <div className="viewGroup">
-            <table>
-              <tbody>
-                <tr>
-                <th>Student Photo</th>
-                <td>{renderPassportPhoto(userProfile.passportPhoto)}</td>
-                  
-                </tr>
-                <tr>
-                  <th>Date of Birth</th>
-                  <td>{formatDate(userProfile.dob)}</td>
-                </tr>
-                <tr>
-                  <th>Address</th>
-                  <td>{userProfile.address}</td>
-                </tr>
-                <tr>
-                  <th>Full Name</th>
-                  <td>{userProfile.name}</td>
-                </tr>
-                <tr>
-                  <th>Phone Number</th>
-                  <td>{userProfile.phoneNumber}</td>
-                </tr>
-                <tr>
-                  <th>College Name</th>
-                  <td>{userProfile.collegeName}</td>
-                </tr>
-                <tr>
-                  <th>University</th>
-                  <td>{userProfile.university}</td>
-                </tr>
-                <tr>
-                  <th>USN</th>
-                  <td>{userProfile.usn}</td>
-                </tr>
-                <tr>
-                  <th>Verification Type</th>
-                  <td>{userProfile.verificationType}</td>
-                </tr>
-                <tr>
-                  <th>Verification ID</th>
-                  <td>{userProfile.verificationId}</td>
-                </tr>
-                <tr>
-                <th>Email</th>
-                <td>{userProfile.email}</td>
-                  
-                </tr>
-              </tbody>
-            </table>
-            <div className="buttonGroup">
-              <button onClick={handleEdit} className="buttonSave">
-                Edit
-              </button>
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <div className="inputGroup">
+                <span className="label">Email:</span>
+                <span className="value">{currentProfile.IIMSTC_ID}</span>
+              </div>
+
+              <div className="inputGroup">
+                <span className="label">Date of Birth:</span>
+                <span className="value">{currentProfile.dob ? formatDate(currentProfile.dob) : ''}</span>
+              </div>
+
+              <div className="inputGroup">
+                <span className="label">Address:</span>
+                <span className="value">{currentProfile.address}</span>
+              </div>
+
+              <div className="inputGroup">
+                <span className="label">Full Name:</span>
+                <span className="value">{currentProfile.name}</span>
+              </div>
+
+              <div className="inputGroup">
+                <span className="label">Phone Number:</span>
+                <span className="value">{currentProfile.phoneNumber}</span>
+              </div>
+
+              <div className="inputGroup">
+                <span className="label">College Name:</span>
+                <span className="value">{currentProfile.collegeName}</span>
+              </div>
+
+              <div className="inputGroup">
+                <span className="label">Branch:</span>
+                <span className="value">{currentProfile.branch}</span>
+              </div>
+
+              <div className="inputGroup">
+                <span className="label">Semester:</span>
+                <span className="value">{currentProfile.semester}</span>
+              </div>
+
+              <div className="inputGroup">
+                <span className="label">USN:</span>
+                <span className="value">{currentProfile.usn}</span>
+              </div>
+
+              <div className="inputGroup">
+                <span className="label">Verification Type:</span>
+                <span className="value">{currentProfile.verificationType}</span>
+              </div>
             </div>
+            <button onClick={handleEdit} className="editButton">Edit</button>
           </div>
         )
       ) : (
-        <p>No user profile available.</p>
+        <div>Loading...</div>
       )}
     </div>
   );

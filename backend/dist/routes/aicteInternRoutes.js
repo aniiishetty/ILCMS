@@ -11,4 +11,5 @@ const router = express_1.default.Router();
 const upload = (0, multer_1.default)({ storage: multer_1.default.memoryStorage() });
 // Route to handle AICTE Intern form submission
 router.post('/create', upload.single('resume'), aicteInternController_1.createAicteIntern);
+router.get('/:id', aicteInternController_1.getAicteInternById);
 exports.default = router;

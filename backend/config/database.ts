@@ -1,7 +1,10 @@
+// src/config/database.ts
 import { Sequelize } from 'sequelize';
-import { config as dotenvConfig } from 'dotenv';
+import * as dotenv from 'dotenv';
 
-dotenvConfig();
+dotenv.config();
+
+console.log(process.env); // Debugging to ensure environment variables are loaded
 
 const sequelize = new Sequelize(
   process.env.DB_NAME as string,

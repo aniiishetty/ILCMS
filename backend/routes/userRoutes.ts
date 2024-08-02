@@ -1,7 +1,6 @@
 import express from 'express';
 import multer from 'multer';
-import { registerUser, loginUser, fetchUserProfile, updateUserProfile, getUserById } from '../controllers/userController';
-
+import { registerUser, loginUser, fetchUserProfile, updateUserProfile, verifyOTP } from '../controllers/userController';
 const router = express.Router();
 const upload = multer(); // Initialize multer without any specific storage configuration
 
@@ -10,6 +9,7 @@ router.post('/register', registerUser);
 
 // Route for user login
 router.post('/login', loginUser);
+router.post('/verify-otp', verifyOTP);
 
 // Route for fetching user profile
 router.post('/profile', fetchUserProfile);
@@ -18,6 +18,6 @@ router.post('/profile', fetchUserProfile);
 router.put('/update-profile', upload.single('passportPhoto'), updateUserProfile);
 
 // Route for getting a user by ID
-router.get('/:id', getUserById);
+// router.get('/:id', getUserById);
 
 export default router;

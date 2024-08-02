@@ -8,6 +8,9 @@ import bodyParser from 'body-parser';
 import path from 'path';
 import studentPhotoRoutes from './routes/studentPhotoRoutes';
 import aicteInternRoutes from './routes/aicteInternRoutes';
+import dailyLogRoutes from './routes/dailyLogRoutes';
+import fileUpload from 'express-fileupload';
+
 
 dotenv.config();
 
@@ -27,10 +30,11 @@ app.use(cors({
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.json());
+app.use(fileUpload());
 
 // Remove or comment out the line serving the uploads directory if not needed
 // app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-
+app.use('/api/daily-logs', dailyLogRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/photos', studentPhotoRoutes);

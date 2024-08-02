@@ -6,10 +6,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.User = void 0;
 const sequelize_1 = require("sequelize");
 const database_1 = __importDefault(require("../config/database"));
+const Degree_1 = require("./Degree");
+const DegreeStatus_1 = require("./DegreeStatus");
+const BranchModel_1 = require("./BranchModel");
+const Colleges_1 = require("./Colleges");
 class User extends sequelize_1.Model {
-    // Define associations
     static associate(models) {
-        User.hasMany(models.AicteIntern, { foreignKey: 'userId', as: 'aicteInterns' });
+        User.hasOne(models.AicteIntern, { foreignKey: 'userId', as: 'aicteInterns' });
     }
 }
 exports.User = User;
@@ -19,13 +22,13 @@ User.init({
         autoIncrement: true,
         primaryKey: true,
     },
-    Username: {
+    IIMSTC_ID: {
         type: sequelize_1.DataTypes.STRING,
-        allowNull: true,
+        allowNull: false,
     },
     password: {
         type: sequelize_1.DataTypes.STRING,
-        allowNull: true,
+        allowNull: false,
     },
     name: {
         type: sequelize_1.DataTypes.STRING,
@@ -39,8 +42,8 @@ User.init({
         type: sequelize_1.DataTypes.STRING,
         allowNull: false,
     },
-    collegeName: {
-        type: sequelize_1.DataTypes.STRING,
+    collegeId: {
+        type: sequelize_1.DataTypes.INTEGER,
         allowNull: false,
     },
     university: {
@@ -51,23 +54,12 @@ User.init({
         type: sequelize_1.DataTypes.STRING,
         allowNull: false,
     },
-    verificationType: {
-        type: sequelize_1.DataTypes.ENUM('Aadhar', 'Passport'),
-        allowNull: false,
-    },
-    verificationId: {
-        type: sequelize_1.DataTypes.STRING,
-        allowNull: false,
-    },
     email: {
         type: sequelize_1.DataTypes.STRING,
         allowNull: false,
+        unique: true,
     },
     gender: {
-        type: sequelize_1.DataTypes.STRING,
-        allowNull: false,
-    },
-    branch: {
         type: sequelize_1.DataTypes.STRING,
         allowNull: false,
     },
@@ -81,7 +73,31 @@ User.init({
     },
     passportPhoto: {
         type: sequelize_1.DataTypes.BLOB('long'),
-        allowNull: true, // Make passportPhoto nullable
+        allowNull: false,
+    },
+    aadharNo: {
+        type: sequelize_1.DataTypes.STRING,
+        allowNull: false,
+    },
+    aadharProof: {
+        type: sequelize_1.DataTypes.BLOB('long'),
+        allowNull: false,
+    },
+    degreeId: {
+        type: sequelize_1.DataTypes.INTEGER,
+        allowNull: false,
+    },
+    degreeStatusId: {
+        type: sequelize_1.DataTypes.INTEGER,
+        allowNull: false,
+    },
+    branchId: {
+        type: sequelize_1.DataTypes.INTEGER,
+        allowNull: false,
+    },
+    otp: {
+        type: sequelize_1.DataTypes.STRING, // Store OTP as a string
+        allowNull: true, // Allow null when not in use
     },
 }, {
     sequelize: database_1.default,
@@ -89,7 +105,13 @@ User.init({
     indexes: [
         {
             unique: true,
-            fields: ['email']
+            fields: ['email', 'IIMSTC_ID'],
         },
-    ]
+    ],
+    timestamps: true,
 });
+// Associations
+User.belongsTo(Degree_1.Degree, { foreignKey: 'degreeId', as: 'degreeDetails' });
+User.belongsTo(DegreeStatus_1.DegreeStatus, { foreignKey: 'degreeStatusId', as: 'degreeStatusDetails' });
+User.belongsTo(BranchModel_1.BranchModel, { foreignKey: 'branchId', as: 'branchDetails' });
+User.belongsTo(Colleges_1.College, { foreignKey: 'collegeId', as: 'collegeDetails' });

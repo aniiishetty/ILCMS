@@ -65,3 +65,24 @@ export const createAicteIntern = async (req: Request, res: Response) => {
     return res.status(500).json({ error: 'Internal Server Error' });
   }
 };
+export const getAicteInternById = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    console.log(`Fetching AICTE Intern with ID: ${id}`); // Logging the ID being fetched
+
+    const aicteIntern = await AicteIntern.findByPk(id, {
+      attributes: ['hodName', 'hodEmail'] // Specify the fields to return
+    });
+
+    if (!aicteIntern) {
+      console.log(`AICTE Intern with ID ${id} not found`); // Log if the intern is not found
+      return res.status(404).json({ error: 'AICTE Intern not found' });
+    }
+
+    console.log(`Fetched AICTE Intern: ${JSON.stringify(aicteIntern)}`); // Log the fetched intern data
+    return res.status(200).json(aicteIntern);
+  } catch (error) {
+    console.error('Error retrieving AICTE Intern:', error);
+    return res.status(500).json({ error: 'Internal Server Error' });
+  }
+};

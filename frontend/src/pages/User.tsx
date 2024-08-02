@@ -1,273 +1,235 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { login as userLogin, register as userRegister } from '../services/userService';
+import { loginUser, registerUser } from '../services/userService';
 import '../styles/tailwind.css';
 
 const User: React.FC = () => {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [email, setEmail] = useState('');
-  const [dob, setDob] = useState('');
-  const [address, setAddress] = useState('');
-  const [collegeName, setCollegeName] = useState('');
-  const [university, setUniversity] = useState('');
-  const [usn, setUsn] = useState('');
-  const [verificationType, setVerificationType] = useState('');
-  const [verificationId, setVerificationId] = useState('');
-  const [gender, setGender] = useState('');
-  const [branch, setBranch] = useState('');
-  const [semester, setSemester] = useState('');
-  const [phoneNumber, setPhoneNumber] = useState('');
+  const [isLogin, setIsLogin] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [mode, setMode] = useState<'user-login' | 'user-signup'>('user-login');
+  const [formData, setFormData] = useState({
+    email: '',
+    name: '',
+    dob: '',
+    address: '',
+    collegeName: '',
+    university: '',
+    usn: '',
+    verificationType: '',
+    verificationId: '',
+    gender: '',
+    branch: '',
+    semester: '',
+    phoneNumber: '',
+    IIMSTC_ID: '',
+    password: '',
+  });
+  const [message, setMessage] = useState('');
   const navigate = useNavigate();
 
-  const handleLoginSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setError(null);
+  useEffect(() => {
+    // Clear local storage when component mounts
+    localStorage.clear();
+  }, []);
 
-    try {
-      await userLogin(email, password);
-      navigate('/user');
-    } catch (err) {
-      setError('Invalid credentials');
-    }
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
   };
 
-  const handleSignupSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(null);
-
     try {
-      const userDetails = {
-        name: username,
-        email,
-        dob,
-        address,
-        collegeName,
-        university,
-        usn,
-        verificationType,
-        verificationId,
-        password,
-        gender,
-        branch,
-        semester,
-        phoneNumber,
-      };
-      await userRegister(userDetails);
-    } catch (err) {
-      setError('');
-    } finally {
-      // Always switch to login mode and clear form fields
-      setMode('user-login');
-      setUsername('');
-      setPassword('');
-      setEmail('');
-      setDob('');
-      setAddress('');
-      setCollegeName('');
-      setUniversity('');
-      setUsn('');
-      setVerificationType('');
-      setVerificationId('');
-      setGender('');
-      setBranch('');
-      setSemester('');
-      setPhoneNumber('');
+      if (isLogin) {
+        const response = await loginUser({
+          IIMSTC_ID: formData.IIMSTC_ID,
+          password: formData.password,
+        });
+        if (response && response.id) {
+          localStorage.setItem('email', response.email);
+          navigate('/user', { replace: true });
+        } else {
+          setMessage('Login failed: Invalid credentials');
+        }
+      } else {
+        const response = await registerUser(formData);
+        if (response.data && response.data.message) {
+          setMessage(response.data.message);
+        } else {
+          setMessage('Registration failed: Please try again');
+        }
+      }
+    } catch (error) {
+      setMessage(isLogin ? 'Login failed' : 'Registration failed');
     }
   };
 
   return (
-    <div className="container">
+    <div className="relative h-screen">
       <div className="background"></div>
-      <div className="form-container">
-        {mode === 'user-login' ? (
-          <div>
-            <h2 className="title">User Login</h2>
-            <form className="form" onSubmit={handleLoginSubmit}>
-              {error && <p className="error">{error}</p>}
+      <div className="container">
+        <div className="mb-4 flex justify-center">
+          <button
+            className={`button mr-2 ${isLogin ? 'button-login' : 'button-register'}`}
+            onClick={() => {
+              setIsLogin(true);
+              setMessage('');
+            }}
+          >
+            Login
+          </button>
+          <button
+            className={`button ${!isLogin ? 'button-login' : 'button-register'}`}
+            onClick={() => {
+              setIsLogin(false);
+              setMessage('');
+            }}
+          >
+            Register
+          </button>
+        </div>
+        <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-4">
+          {isLogin ? (
+            <>
               <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Email"
-                required
+                name="IIMSTC_ID"
+                type="text"
+                value={formData.IIMSTC_ID}
+                onChange={handleChange}
+                placeholder="IIMSTC ID"
                 className="input"
               />
-              <input
-                type={showPassword ? 'text' : 'password'}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Password"
-                required
-                className="input"
-              />
-              <div className="checkbox">
+              <div className="input-container">
                 <input
-                  type="checkbox"
-                  checked={showPassword}
-                  onChange={(e) => setShowPassword(e.target.checked)}
+                  name="password"
+                  type={showPassword ? 'text' : 'password'}
+                  value={formData.password}
+                  onChange={handleChange}
+                  placeholder="Password"
+                  className="input"
                 />
-                <label>Show Password</label>
-              </div>
-              <button type="submit" className="button">
-                Login
-              </button>
-              <p>
-                Don't have an account?{' '}
                 <button
                   type="button"
-                  className="link"
-                  onClick={() => setMode('user-signup')}
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="button-show-password"
                 >
-                  Sign Up
+                  {showPassword ? 'Hide' : 'Show'}
                 </button>
-              </p>
-            </form>
-          </div>
-        ) : (
-          <div>
-            <h2 className="title">User Signup</h2>
-            <form className="form" onSubmit={handleSignupSubmit}>
-              {error && <p className="error">{error}</p>}
+              </div>
+            </>
+          ) : (
+            <>
               <input
+                name="email"
+                type="email"
+                value={formData.email}
+                onChange={handleChange}
+                placeholder="Email"
+                className="input"
+              />
+              <input
+                name="name"
                 type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
+                value={formData.name}
+                onChange={handleChange}
                 placeholder="Name"
-                required
-                className="input input-sm"
+                className="input"
               />
               <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Email"
-                required
-                className="input input-sm"
-              />
-              <input
+                name="dob"
                 type="date"
-                value={dob}
-                onChange={(e) => setDob(e.target.value)}
-                placeholder="Date of Birth"
-                required
-                className="input input-sm"
+                value={formData.dob}
+                onChange={handleChange}
+                className="input"
               />
               <input
+                name="address"
                 type="text"
-                value={address}
-                onChange={(e) => setAddress(e.target.value)}
+                value={formData.address}
+                onChange={handleChange}
                 placeholder="Address"
-                required
-                className="input input-sm"
+                className="input"
               />
               <input
+                name="collegeName"
                 type="text"
-                value={collegeName}
-                onChange={(e) => setCollegeName(e.target.value)}
+                value={formData.collegeName}
+                onChange={handleChange}
                 placeholder="College Name"
-                required
-                className="input input-sm"
+                className="input"
               />
               <input
+                name="university"
                 type="text"
-                value={university}
-                onChange={(e) => setUniversity(e.target.value)}
+                value={formData.university}
+                onChange={handleChange}
                 placeholder="University"
-                required
-                className="input input-sm"
+                className="input"
               />
               <input
+                name="usn"
                 type="text"
-                value={usn}
-                onChange={(e) => setUsn(e.target.value)}
+                value={formData.usn}
+                onChange={handleChange}
                 placeholder="USN"
-                required
-                className="input input-sm"
+                className="input"
               />
               <input
+                name="verificationType"
                 type="text"
-                value={verificationType}
-                onChange={(e) => setVerificationType(e.target.value)}
+                value={formData.verificationType}
+                onChange={handleChange}
                 placeholder="Verification Type"
-                required
-                className="input input-sm"
+                className="input"
               />
               <input
+                name="verificationId"
                 type="text"
-                value={verificationId}
-                onChange={(e) => setVerificationId(e.target.value)}
+                value={formData.verificationId}
+                onChange={handleChange}
                 placeholder="Verification ID"
-                required
-                className="input input-sm"
+                className="input"
               />
               <input
+                name="gender"
                 type="text"
-                value={gender}
-                onChange={(e) => setGender(e.target.value)}
+                value={formData.gender}
+                onChange={handleChange}
                 placeholder="Gender"
-                required
-                className="input input-sm"
+                className="input"
               />
               <input
+                name="branch"
                 type="text"
-                value={branch}
-                onChange={(e) => setBranch(e.target.value)}
+                value={formData.branch}
+                onChange={handleChange}
                 placeholder="Branch"
-                required
-                className="input input-sm"
+                className="input"
               />
               <input
+                name="semester"
                 type="text"
-                value={semester}
-                onChange={(e) => setSemester(e.target.value)}
+                value={formData.semester}
+                onChange={handleChange}
                 placeholder="Semester"
-                required
-                className="input input-sm"
+                className="input"
               />
               <input
+                name="phoneNumber"
                 type="text"
-                value={phoneNumber}
-                onChange={(e) => setPhoneNumber(e.target.value)}
+                value={formData.phoneNumber}
+                onChange={handleChange}
                 placeholder="Phone Number"
-                required
-                className="input input-sm"
+                className="input"
               />
-              <input
-                type={showPassword ? 'text' : 'password'}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Password"
-                required
-                className="input input-sm"
-              />
-              <div className="checkbox">
-                <input
-                  type="checkbox"
-                  checked={showPassword}
-                  onChange={(e) => setShowPassword(e.target.checked)}
-                />
-                <label>Show Password</label>
-              </div>
-              <button type="submit" className="button">
-                Signup
-              </button>
-              <p>
-                Already have an account?{' '}
-                <button
-                  type="button"
-                  className="link"
-                  onClick={() => setMode('user-login')}
-                >
-                  Login
-                </button>
-              </p>
-            </form>
-          </div>
-        )}
+            </>
+          )}
+          <button type="submit" className="button-login">
+            {isLogin ? 'Login' : 'Register'}
+          </button>
+        </form>
+        {message && <p className="message">{message}</p>}
       </div>
     </div>
   );

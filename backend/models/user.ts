@@ -1,51 +1,61 @@
 import { DataTypes, Model, Optional } from 'sequelize';
 import sequelize from '../config/database';
 import { AicteIntern } from './aicteIntern';
+import { Degree } from './Degree';
+import { DegreeStatus } from './DegreeStatus';
+import { BranchModel } from './BranchModel';
+import { College } from './Colleges';
 
 interface UserAttributes {
   id: number;
-  Username: string;
+  IIMSTC_ID: string;
   password: string;
   name: string;
   dob: Date;
   address: string;
-  collegeName: string;
+  collegeId: number;
   university: string;
   usn: string;
-  verificationType: 'Aadhar' | 'Passport';
-  verificationId: string;
   email: string;
   gender: string;
-  branch: string;
   semester: string;
   phoneNumber: string;
-  passportPhoto?: Buffer; // Make passportPhoto optional
+  passportPhoto: Buffer;
+  aadharNo: string;
+  aadharProof: Buffer;
+  degreeId: number;
+  degreeStatusId: number;
+  branchId: number;
+  otp?: string | null;
 }
 
-interface UserCreationAttributes extends Optional<UserAttributes, 'id' | 'passportPhoto'> {} // Make passportPhoto optional during creation
+interface UserCreationAttributes extends Optional<UserAttributes, 'id' | 'otp'> {}
+
 
 class User extends Model<UserAttributes, UserCreationAttributes> implements UserAttributes {
   public id!: number;
-  public Username!: string;
+  public IIMSTC_ID!: string;
   public password!: string;
   public name!: string;
   public dob!: Date;
   public address!: string;
-  public collegeName!: string;
+  public collegeId!: number;
   public university!: string;
   public usn!: string;
-  public verificationType!: 'Aadhar' | 'Passport';
-  public verificationId!: string;
   public email!: string;
   public gender!: string;
-  public branch!: string;
   public semester!: string;
   public phoneNumber!: string;
-  public passportPhoto?: Buffer; // Optional field
+  public passportPhoto!: Buffer;
+  public aadharNo!: string;
+  public aadharProof!: Buffer;
+  public degreeId!: number;
+  public degreeStatusId!: number;
+  public branchId!: number;
+  public otp!:string;
 
-  // Define associations
   static associate(models: any) {
-    User.hasMany(models.AicteIntern, { foreignKey: 'userId', as: 'aicteInterns' });
+    User.hasOne(models.AicteIntern, { foreignKey: 'userId', as: 'aicteInterns' });
   }
 }
 
@@ -56,13 +66,13 @@ User.init(
       autoIncrement: true,
       primaryKey: true,
     },
-    Username: {
+    IIMSTC_ID: {
       type: DataTypes.STRING,
-      allowNull: true,
+      allowNull: false,
     },
     password: {
       type: DataTypes.STRING,
-      allowNull: true,
+      allowNull: false,
     },
     name: {
       type: DataTypes.STRING,
@@ -76,8 +86,8 @@ User.init(
       type: DataTypes.STRING,
       allowNull: false,
     },
-    collegeName: {
-      type: DataTypes.STRING,
+    collegeId: {
+      type: DataTypes.INTEGER,
       allowNull: false,
     },
     university: {
@@ -88,23 +98,12 @@ User.init(
       type: DataTypes.STRING,
       allowNull: false,
     },
-    verificationType: {
-      type: DataTypes.ENUM('Aadhar', 'Passport'),
-      allowNull: false,
-    },
-    verificationId: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
     email: {
       type: DataTypes.STRING,
       allowNull: false,
+      unique: true,
     },
     gender: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    branch: {
       type: DataTypes.STRING,
       allowNull: false,
     },
@@ -118,7 +117,31 @@ User.init(
     },
     passportPhoto: {
       type: DataTypes.BLOB('long'),
-      allowNull: true, // Make passportPhoto nullable
+      allowNull: false,
+    },
+    aadharNo: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    aadharProof: {
+      type: DataTypes.BLOB('long'),
+      allowNull: false,
+    },
+    degreeId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    degreeStatusId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    branchId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    otp: {
+      type: DataTypes.STRING, // Store OTP as a string
+      allowNull: true, // Allow null when not in use
     },
   },
   {
@@ -126,10 +149,19 @@ User.init(
     tableName: 'users',
     indexes: [
       {
-      unique: true,
-      fields: ['email']
+        unique: true,
+        fields: ['email', 'IIMSTC_ID'],
       },
-    ]
+    ],
+    timestamps: true,
   }
 );
+
+// Associations
+User.belongsTo(Degree, { foreignKey: 'degreeId', as: 'degreeDetails' });
+User.belongsTo(DegreeStatus, { foreignKey: 'degreeStatusId', as: 'degreeStatusDetails' });
+User.belongsTo(BranchModel, { foreignKey: 'branchId', as: 'branchDetails' });
+User.belongsTo(College, { foreignKey: 'collegeId', as: 'collegeDetails' });
+
+
 export { User };

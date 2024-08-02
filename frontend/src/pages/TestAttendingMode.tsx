@@ -90,7 +90,6 @@ const TestAttendingMode = () => {
     setActiveSection(section);
   };
 
-
   return (
     <div className="relative flex">
       {/* Logo positioned absolutely at the top right */}
@@ -186,7 +185,7 @@ const TestAttendingMode = () => {
               <div className="flex justify-between items-center mb-6">
                 <h1 className="text-2xl font-bold text-black">Research Internship Program</h1>
                 <button
-                onClick={() => handleSidebarClick('aicteIntern')}
+                  onClick={() => handleSidebarClick('aicteIntern')}
                   className="bg-lime-600 text-white font-semibold py-2 px-4 rounded hover:bg-lime-500 transition"
                   aria-label="Enroll Now"
                 >
@@ -196,7 +195,7 @@ const TestAttendingMode = () => {
               <NormInternship />
             </>
           )}
-           {activeSection === 'aicteIntern' && userProfile && (
+          {activeSection === 'aicteIntern' && userProfile && (
             <div className="flex justify-center">
               <div className="w-full max-w-4xl"> {/* Increased max-width */}
                 <AICTE userId={Number(userProfile.id)} />
@@ -210,16 +209,16 @@ const TestAttendingMode = () => {
 
       {isHelpOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-75 z-50">
-          <div className="bg-white p-6 rounded-md shadow-md max-w-md mx-auto">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-bold">Help</h2>
-              <button onClick={() => setIsHelpOpen(false)} aria-label="Close">
-                <AiOutlineClose size={24} />
-              </button>
-            </div>
-            <p className="text-gray-700 mb-4">
-              For support, please contact our help desk at support@example.com or call us at 1-800-123-4567.
-            </p>
+          <div className="bg-white p-8 rounded-md w-full max-w-lg">
+            <h2 className="text-2xl font-bold mb-4">Help</h2>
+            <p>If you need assistance, please contact our support team at Care@arinyacosmetics.com.</p>
+            <button
+              onClick={() => setIsHelpOpen(false)}
+              className="bg-gray-800 text-white font-semibold py-2 px-4 rounded mt-4 hover:bg-gray-700 transition"
+              aria-label="Close Help"
+            >
+              <AiOutlineClose size={24} />
+            </button>
           </div>
         </div>
       )}

@@ -12,27 +12,36 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.AicteIntern = exports.StudentPhoto = exports.User = exports.Admin = exports.connectDB = void 0;
-const database_1 = __importDefault(require("../config/database")); // Assuming sequelize is properly configured in this file
-const admin_1 = require("./admin"); // Importing Admin model from ./admin
+exports.DegreeStatus = exports.BranchModel = exports.Degree = exports.InternshipModel = exports.College = exports.AicteIntern = exports.StudentPhoto = exports.User = exports.Admin = exports.connectDB = void 0;
+const database_1 = __importDefault(require("../config/database"));
+const admin_1 = require("./admin");
 Object.defineProperty(exports, "Admin", { enumerable: true, get: function () { return admin_1.Admin; } });
-const user_1 = require("./user"); // Importing User model from ./user
+const user_1 = require("./user");
 Object.defineProperty(exports, "User", { enumerable: true, get: function () { return user_1.User; } });
-const studentPhoto_1 = require("./studentPhoto"); // Importing StudentPhoto model
+const studentPhoto_1 = require("./studentPhoto");
 Object.defineProperty(exports, "StudentPhoto", { enumerable: true, get: function () { return studentPhoto_1.StudentPhoto; } });
-const aicteIntern_1 = require("./aicteIntern"); // Importing AicteIntern model
+const aicteIntern_1 = require("./aicteIntern");
 Object.defineProperty(exports, "AicteIntern", { enumerable: true, get: function () { return aicteIntern_1.AicteIntern; } });
+const Colleges_1 = require("./Colleges");
+Object.defineProperty(exports, "College", { enumerable: true, get: function () { return Colleges_1.College; } });
+const InternshipModel_1 = require("./InternshipModel");
+Object.defineProperty(exports, "InternshipModel", { enumerable: true, get: function () { return InternshipModel_1.InternshipModel; } });
+const Degree_1 = require("./Degree");
+Object.defineProperty(exports, "Degree", { enumerable: true, get: function () { return Degree_1.Degree; } });
+const BranchModel_1 = require("./BranchModel");
+Object.defineProperty(exports, "BranchModel", { enumerable: true, get: function () { return BranchModel_1.BranchModel; } });
+const DegreeStatus_1 = require("./DegreeStatus");
+Object.defineProperty(exports, "DegreeStatus", { enumerable: true, get: function () { return DegreeStatus_1.DegreeStatus; } });
+// Initialize models
 // Initialize models
 const connectDB = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
         // Authenticate the connection
         yield database_1.default.authenticate();
         console.log('Connection has been established successfully.');
-        user_1.User.associate({ AicteIntern: aicteIntern_1.AicteIntern });
-        aicteIntern_1.AicteIntern.associate({ User: user_1.User });
-        // Initialize models
-        // (Models are already imported, so they are initialized when Sequelize.sync() is called)
         // Define model associations
+        user_1.User.hasOne(aicteIntern_1.AicteIntern, { foreignKey: 'userId', as: 'aicteIntern' });
+        aicteIntern_1.AicteIntern.belongsTo(user_1.User, { foreignKey: 'userId', as: 'user' });
         // Sync the database models with { alter: true } to adjust schema without dropping tables
         yield database_1.default.sync({ alter: true });
         console.log('Database synced');

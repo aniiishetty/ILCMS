@@ -75,7 +75,7 @@ const FullCalendarComponent: React.FC = () => {
         <div className="absolute inset-0 flex items-center justify-center bg-gray-900 bg-opacity-80 z-10">
           <div className="bg-gray-800 p-6 rounded-lg shadow-lg max-w-lg w-full relative">
             <h3 className="text-xl mb-4 text-gray-200">Daily Log for {selectedDate.toDateString()}</h3>
-            <DailyLogForm />
+            <DailyLogForm aicteInternId={0} />
             <button 
               onClick={() => setSelectedDate(null)} 
               className="absolute top-4 right-4 text-gray-300 hover:text-white">

@@ -2,9 +2,9 @@ import axios from 'axios';
 
 const API_URL = 'http://localhost:5000/api/users';
 
-interface UserDetails {
-  name: string;
+interface RegisterData {
   email: string;
+  name: string;
   dob: string;
   address: string;
   collegeName: string;
@@ -12,43 +12,50 @@ interface UserDetails {
   usn: string;
   verificationType: string;
   verificationId: string;
-  password: string;
   gender: string;
   branch: string;
   semester: string;
   phoneNumber: string;
-  // Allow null
 }
 
-export const register = async (userDetails: UserDetails) => {
-  const formData = new FormData();
+interface LoginData {
+  IIMSTC_ID: string;
+  password: string;
+}
 
-  Object.keys(userDetails).forEach((key) => {
-    const value = userDetails[key as keyof UserDetails];
-    if (value !== undefined) {
-      formData.append(key, value as any); // Use 'any' to handle different types
+export const registerUser = async (data: RegisterData) => {
+  try {
+    const response = await axios.post(`${API_URL}/register`, data);
+    return response;
+  } catch (error) {
+    console.error('Error during registration:', error);
+    throw error;
+  }
+};
+
+export const loginUser = async (data: LoginData) => {
+  try {
+    const response = await axios.post(`${API_URL}/login`, data);
+    
+    if (response.data && response.data.token && response.data.user && response.data.user.IIMSTC_ID) {
+      localStorage.setItem('token', response.data.token); // Store token in localStorage
+      localStorage.setItem('IIMSTC_ID', response.data.user.IIMSTC_ID); // Store IIMSTC_ID in localStorage
+      return response.data.user;
+    } else {
+      console.error('Login failed: Response data is missing token or IIMSTC_ID', response.data);
+      throw new Error('Login failed: No token or IIMSTC_ID returned');
     }
-  });
-
-  const response = await axios.post(`${API_URL}/register`, formData, {
-    headers: { 'Content-Type': 'multipart/form-data' },
-  });
-  return response.data;
+  } catch (error) {
+    console.error('Error during login request:', error);
+    throw error;
+  }
 };
 
-export const login = async (email: string, password: string) => {
-  const response = await axios.post(`${API_URL}/login`, { email, password });
-  const { id, token } = response.data;
-  localStorage.setItem('token', response.data.token);
-  localStorage.setItem('email', email);
-  localStorage.setItem('id', id);
-  return response.data;
-};
 
 export interface UserProfile {
   id: string; 
   name: string;
-  email: string;
+  IIMSTC_ID: string; // Use IIMSTC_ID instead of email
   dob: string;
   address: string;
   collegeName: string;
@@ -65,11 +72,17 @@ export interface UserProfile {
 
 export const fetchUserProfile = async () => {
   const token = localStorage.getItem('token');
-  const email = localStorage.getItem('email');
-  
+  const IIMSTC_ID = localStorage.getItem('IIMSTC_ID');
+  console.log('Token:', token); // Debug log
+  console.log('IIMSTC_ID:', IIMSTC_ID); // Debug log
 
+  if (!token || !IIMSTC_ID) {
+    console.error('Token or IIMSTC_ID is missing from localStorage');
+    throw new Error('Token or IIMSTC_ID is missing from localStorage');
+  }
+  
   try {
-    const response = await axios.post(`${API_URL}/profile`, { email }, {
+    const response = await axios.post(`${API_URL}/profile`, { IIMSTC_ID }, {
       headers: {
         'Authorization': `Bearer ${token}`,
       },
@@ -77,6 +90,7 @@ export const fetchUserProfile = async () => {
     if (response.data && response.data.user) {
       return response.data.user;
     } else {
+      console.error('Failed to fetch user profile: Response data is missing user information', response.data);
       throw new Error('Failed to fetch user profile');
     }
   } catch (error) {
@@ -109,6 +123,7 @@ export const updateUserProfile = async (profile: UserProfile) => {
     throw error;
   }
 };
+
 export const fetchUserDetails = async (userId: number) => {
   try {
     const response = await axios.get(`${API_URL}/${userId}`);
@@ -120,9 +135,9 @@ export const fetchUserDetails = async (userId: number) => {
 };
 
 export default {
-  register,
-  login,
+  registerUser,
+  loginUser,
   fetchUserProfile,
   updateUserProfile,
-  fetchUserDetails // Ensure this is exported
+  fetchUserDetails
 };
