@@ -23,6 +23,8 @@ const path_1 = __importDefault(require("path"));
 const studentPhotoRoutes_1 = __importDefault(require("./routes/studentPhotoRoutes"));
 const aicteInternRoutes_1 = __importDefault(require("./routes/aicteInternRoutes"));
 const dailyLogRoutes_1 = __importDefault(require("./routes/dailyLogRoutes"));
+const collegeRoutes_1 = __importDefault(require("./routes/collegeRoutes"));
+const degreeRoutes_1 = __importDefault(require("./routes/degreeRoutes"));
 const express_fileupload_1 = __importDefault(require("express-fileupload"));
 dotenv_1.default.config();
 const app = (0, express_1.default)();
@@ -48,6 +50,8 @@ app.use('/api/auth', authRoutes_1.default);
 app.use('/api/users', userRoutes_1.default);
 app.use('/api/photos', studentPhotoRoutes_1.default);
 app.use('/api/aicte-interns', aicteInternRoutes_1.default);
+app.use('/api/college', collegeRoutes_1.default);
+app.use('/api/degree', degreeRoutes_1.default);
 app.listen(port, () => __awaiter(void 0, void 0, void 0, function* () {
     console.log(`Server running on port ${port}`);
     yield (0, models_1.connectDB)();

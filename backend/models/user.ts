@@ -133,7 +133,7 @@ User.init(
     },
     degreeStatusId: {
       type: DataTypes.INTEGER,
-      allowNull: false,
+      allowNull: true,
     },
     branchId: {
       type: DataTypes.INTEGER,

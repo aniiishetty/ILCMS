@@ -17,7 +17,7 @@ DegreeStatus.init({
         autoIncrement: true,
         primaryKey: true,
     },
-    Status: {
+    StatusName: {
         type: sequelize_1.DataTypes.STRING,
         allowNull: false,
     },

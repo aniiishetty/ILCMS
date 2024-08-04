@@ -89,7 +89,7 @@ User.init({
     },
     degreeStatusId: {
         type: sequelize_1.DataTypes.INTEGER,
-        allowNull: false,
+        allowNull: true,
     },
     branchId: {
         type: sequelize_1.DataTypes.INTEGER,

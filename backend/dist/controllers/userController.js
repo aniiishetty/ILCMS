@@ -33,6 +33,8 @@ const Degree_1 = require("../models/Degree");
 const DegreeStatus_1 = require("../models/DegreeStatus");
 const BranchModel_1 = require("../models/BranchModel");
 const models_1 = require("../models");
+const multer_1 = __importDefault(require("multer"));
+const upload = (0, multer_1.default)({ storage: multer_1.default.memoryStorage() });
 // Configure the email transport
 const transporter = nodemailer_1.default.createTransport({
     service: 'Gmail',
@@ -42,15 +44,19 @@ const transporter = nodemailer_1.default.createTransport({
     },
 });
 // Generate a unique IIMSTC ID
-const generateIIMSTCID = (collegeId, branchId) => __awaiter(void 0, void 0, void 0, function* () {
-    // Fetch college code and branch name based on IDs
-    const college = yield models_1.College.findByPk(collegeId);
-    const branch = yield BranchModel_1.BranchModel.findByPk(branchId);
-    if (!college || !branch) {
-        throw new Error('Invalid college or branch ID');
+const generateIIMSTCID = (collegeId) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const college = yield models_1.College.findByPk(collegeId);
+        if (!college) {
+            throw new Error(`College with ID ${collegeId} not found`);
+        }
+        const randomNum = Math.floor(100 + Math.random() * 900); // Generate a 3-digit random number
+        return `II${college.code}${randomNum}`;
     }
-    const randomNum = Math.floor(100 + Math.random() * 900); // Generate a 3-digit random number
-    return `II${college.code}${branch.BranchName}${randomNum}`;
+    catch (error) {
+        console.error('Error generating IIMSTC ID:', error);
+        throw error;
+    }
 });
 // Generate an OTP
 const generateOTP = () => {
@@ -78,7 +84,7 @@ const registerUser = (req, res) => __awaiter(void 0, void 0, void 0, function* (
             return res.status(400).json({ message: 'Email already exists' });
         }
         // Generate unique IIMSTC ID, OTP, and password
-        const IIMSTC_ID = yield generateIIMSTCID(collegeId, branchId);
+        const IIMSTC_ID = yield generateIIMSTCID(collegeId);
         const otp = generateOTP();
         const password = crypto_1.default.randomBytes(8).toString('hex');
         const hashedPassword = yield bcrypt_1.default.hash(password, 10);
@@ -222,14 +228,18 @@ exports.fetchUserProfile = fetchUserProfile;
 // Update user profile
 const updateUserProfile = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a, _b, _c, _d;
-    const { IIMSTC_ID, name, dob, address, collegeName, university, usn, gender, semester, phoneNumber, degreeId, degreeStatusId, branchId, } = req.body;
-    // Handle files
-    const passportPhoto = ((_b = (_a = req.files) === null || _a === void 0 ? void 0 : _a.passportPhoto) === null || _b === void 0 ? void 0 : _b.data) || null;
-    const aadharProof = ((_d = (_c = req.files) === null || _c === void 0 ? void 0 : _c.aadharProof) === null || _d === void 0 ? void 0 : _d.data) || null;
-    if (!IIMSTC_ID) {
-        return res.status(400).json({ success: false, error: 'IIMSTC ID is required' });
-    }
     try {
+        // Get the user's details from the request body
+        const { IIMSTC_ID, name, dob, address, collegeId, university, usn, gender, semester, phoneNumber, degreeId, degreeStatusId, branchId, } = req.body;
+        // Get the uploaded files
+        const files = req.files;
+        const passportPhoto = ((_b = (_a = files.passportPhoto) === null || _a === void 0 ? void 0 : _a[0]) === null || _b === void 0 ? void 0 : _b.buffer) || null;
+        const aadharProof = ((_d = (_c = files.aadharProof) === null || _c === void 0 ? void 0 : _c[0]) === null || _d === void 0 ? void 0 : _d.buffer) || null;
+        // Check if IIMSTC_ID is provided
+        if (!IIMSTC_ID) {
+            return res.status(400).json({ success: false, error: 'IIMSTC ID is required' });
+        }
+        // Find the user by IIMSTC_ID
         const user = yield user_1.User.findOne({ where: { IIMSTC_ID } });
         if (!user) {
             return res.status(404).json({ success: false, error: 'User not found' });
@@ -241,8 +251,8 @@ const updateUserProfile = (req, res) => __awaiter(void 0, void 0, void 0, functi
             user.dob = dob;
         if (address)
             user.address = address;
-        if (collegeName)
-            user.collegeId = collegeName;
+        if (collegeId)
+            user.collegeId = collegeId;
         if (university)
             user.university = university;
         if (usn)
@@ -263,14 +273,23 @@ const updateUserProfile = (req, res) => __awaiter(void 0, void 0, void 0, functi
             user.passportPhoto = passportPhoto;
         if (aadharProof)
             user.aadharProof = aadharProof;
+        // Save the updated user profile
         yield user.save();
         // Log the updated user profile
         console.log('Updated user profile:', user);
+        // Return a success response
         res.status(200).json({ success: true, message: 'User profile updated successfully', user });
     }
     catch (error) {
+        // Log the error
         console.error('Error updating user profile:', error);
-        res.status(500).json({ success: false, error: 'Internal server error' });
+        // Return an error response
+        if (error instanceof Error && error.message.includes('Unexpected end of form')) {
+            res.status(400).json({ success: false, error: 'Invalid request payload' });
+        }
+        else {
+            res.status(500).json({ success: false, error: 'Internal server error' });
+        }
     }
 });
 exports.updateUserProfile = updateUserProfile;

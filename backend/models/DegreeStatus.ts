@@ -5,7 +5,7 @@ import { Degree } from './Degree';
 
 interface DegreeStatusAttributes {
   DegreeStatusID: number;
-  Status: string;
+  StatusName: string;
   degreeId?: number; // Allowing degreeId to be optional
 }
 
@@ -13,7 +13,7 @@ interface DegreeStatusCreationAttributes extends Optional<DegreeStatusAttributes
 
 class DegreeStatus extends Model<DegreeStatusAttributes, DegreeStatusCreationAttributes> implements DegreeStatusAttributes {
   public DegreeStatusID!: number;
-  public Status!: string;
+  public StatusName!: string;
   public degreeId?: number; // Allowing degreeId to be optional
 }
 
@@ -24,7 +24,7 @@ DegreeStatus.init(
       autoIncrement: true,
       primaryKey: true,
     },
-    Status: {
+    StatusName: {
       type: DataTypes.STRING,
       allowNull: false,
     },

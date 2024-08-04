@@ -9,7 +9,15 @@ import { DegreeStatus } from '../models/DegreeStatus';
 import { BranchModel } from '../models/BranchModel';
 import { UploadedFile } from 'express-fileupload';
 import { College } from '../models';
+import multer from 'multer';
 
+
+const upload = multer({ storage: multer.memoryStorage() });
+
+type Files = {
+  passportPhoto?: Express.Multer.File[];
+  aadharProof?: Express.Multer.File[];
+};
 // Configure the email transport
 const transporter = nodemailer.createTransport({
   service: 'Gmail',
@@ -20,18 +28,24 @@ const transporter = nodemailer.createTransport({
 });
 
 // Generate a unique IIMSTC ID
-const generateIIMSTCID = async (collegeId: number, branchId: number): Promise<string> => {
-  // Fetch college code and branch name based on IDs
-  const college = await College.findByPk(collegeId);
-  const branch = await BranchModel.findByPk(branchId);
+const generateIIMSTCID = async (collegeId: number ): Promise<string> => {
+  try {
+    const college = await College.findByPk(collegeId);
+    
 
-  if (!college || !branch) {
-    throw new Error('Invalid college or branch ID');
+    if (!college) {
+      throw new Error(`College with ID ${collegeId} not found`);
+    }
+
+    
+    const randomNum = Math.floor(100 + Math.random() * 900); // Generate a 3-digit random number
+    return `II${college.code}${randomNum}`;
+  } catch (error) {
+    console.error('Error generating IIMSTC ID:', error);
+    throw error;
   }
-
-  const randomNum = Math.floor(100 + Math.random() * 900); // Generate a 3-digit random number
-  return `II${college.code}${branch.BranchName}${randomNum}`;
 };
+
 
 
 // Generate an OTP
@@ -81,7 +95,7 @@ const registerUser = async (req: Request, res: Response) => {
     }
 
     // Generate unique IIMSTC ID, OTP, and password
-    const IIMSTC_ID = await generateIIMSTCID(collegeId, branchId);
+    const IIMSTC_ID = await generateIIMSTCID(collegeId);
     const otp = generateOTP();
     const password = crypto.randomBytes(8).toString('hex');
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -193,6 +207,7 @@ const loginUser = async (req: Request, res: Response) => {
       IIMSTC_ID: user.IIMSTC_ID,
       email: user.email,
       name: user.name,
+      
     };
 
     return res.status(200).json({ message: 'Login successful', user: userDetails, token });
@@ -241,32 +256,37 @@ const fetchUserProfile = async (req: Request, res: Response) => {
 };
 
 // Update user profile
+
 const updateUserProfile = async (req: Request, res: Response) => {
-  const {
-    IIMSTC_ID,
-    name,
-    dob,
-    address,
-    collegeName,
-    university,
-    usn,
-    gender,
-    semester,
-    phoneNumber,
-    degreeId,
-    degreeStatusId,
-    branchId,
-  } = req.body;
-
-  // Handle files
-  const passportPhoto = (req.files as unknown as { [fieldname: string]: UploadedFile })?.passportPhoto?.data || null;
-  const aadharProof = (req.files as unknown as { [fieldname: string]: UploadedFile })?.aadharProof?.data || null;
-
-  if (!IIMSTC_ID) {
-    return res.status(400).json({ success: false, error: 'IIMSTC ID is required' });
-  }
-
   try {
+    // Get the user's details from the request body
+    const {
+      IIMSTC_ID,
+      name,
+      dob,
+      address,
+      collegeId,
+      university,
+      usn,
+      gender,
+      semester,
+      phoneNumber,
+      degreeId,
+      degreeStatusId,
+      branchId,
+    } = req.body;
+
+    // Get the uploaded files
+    const files = req.files as any;
+    const passportPhoto = files.passportPhoto?.[0]?.buffer || null;
+    const aadharProof = files.aadharProof?.[0]?.buffer || null;
+
+    // Check if IIMSTC_ID is provided
+    if (!IIMSTC_ID) {
+      return res.status(400).json({ success: false, error: 'IIMSTC ID is required' });
+    }
+
+    // Find the user by IIMSTC_ID
     const user = await User.findOne({ where: { IIMSTC_ID } });
     if (!user) {
       return res.status(404).json({ success: false, error: 'User not found' });
@@ -276,7 +296,7 @@ const updateUserProfile = async (req: Request, res: Response) => {
     if (name) user.name = name;
     if (dob) user.dob = dob;
     if (address) user.address = address;
-    if (collegeName) user.collegeId = collegeName;
+    if (collegeId) user.collegeId = collegeId;
     if (university) user.university = university;
     if (usn) user.usn = usn;
     if (gender) user.gender = gender;
@@ -288,16 +308,26 @@ const updateUserProfile = async (req: Request, res: Response) => {
     if (passportPhoto) user.passportPhoto = passportPhoto;
     if (aadharProof) user.aadharProof = aadharProof;
 
+    // Save the updated user profile
     await user.save();
 
     // Log the updated user profile
     console.log('Updated user profile:', user);
 
+    // Return a success response
     res.status(200).json({ success: true, message: 'User profile updated successfully', user });
   } catch (error: any) {
+    // Log the error
     console.error('Error updating user profile:', error);
-    res.status(500).json({ success: false, error: 'Internal server error' });
+
+    // Return an error response
+    if (error instanceof Error && error.message.includes('Unexpected end of form')) {
+      res.status(400).json({ success: false, error: 'Invalid request payload' });
+    } else {
+      res.status(500).json({ success: false, error: 'Internal server error' });
+    }
   }
 };
+
 
 export { registerUser, loginUser, fetchUserProfile, updateUserProfile, verifyOTP };

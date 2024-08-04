@@ -2,73 +2,150 @@ import axios from 'axios';
 
 const API_URL = 'http://localhost:5000/api/users';
 
-interface RegisterData {
-  email: string;
+export const loginUser = async (loginData: { IIMSTC_ID: string; password: string }) => {
+  try {
+    const response = await axios.post(`${API_URL}/login`, loginData);
+    const { token, user } = response.data;
+
+    // Store token and IIMSTC_ID in localStorage
+    localStorage.setItem('token', token);
+    localStorage.setItem('IIMSTC_ID', user.IIMSTC_ID);
+
+    return response.data;
+  } catch (error) {
+    console.error('Error logging in:', error);
+    throw error;
+  }
+};
+export const verifyOTP = async (otpData: { email: string; otp: string }) => {
+  try {
+    const response = await axios.post(`${API_URL}/verify-otp`, otpData);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const registerUser = async (formData: FormData) => {
+  try {
+    const response = await axios.post(`${API_URL}/register`, formData);
+    return response.data;
+  } catch (error) {
+    console.error('Error registering user:', error);
+    throw error;
+  }
+};
+export const fetchColleges = async () => {
+  try {
+    const response = await axios.get(`http://localhost:5000/api/college/colleges`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching colleges:', error);
+    throw error;
+  }
+};
+export const fetchDegrees = async () => {
+  try {
+    const response = await axios.get('http://localhost:5000/api/college/degrees');
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching degrees:', error);
+    throw error;
+  }
+};
+
+export const fetchBranches = async () => {
+  try {
+    const response = await axios.get('http://localhost:5000/api/college/branches');
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching branches:', error);
+    throw error;
+  }
+};
+
+export const fetchDegreeStatuses = async () => {
+  try {
+    const response = await axios.get('http://localhost:5000/api/college/degree-statuses');
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching degree statuses:', error);
+    throw error;
+  }
+};
+export const fetchDegreeStatusesByDegree = async (degreeId: string) => {
+  try {
+    const response = await axios.get(`http://localhost:5000/api/degree/degree-statuses`, {
+      params: { degreeId }
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching degree statuses:', error);
+    throw error;
+  }
+};
+
+// Fetch branches by degree ID
+export const fetchBranchesByDegree = async (degreeId: string) => {
+  try {
+    const response = await axios.get(`http://localhost:5000/api/degree/branches`, {
+      params: { degreeId }
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching branches:', error);
+    throw error;
+  }
+};
+
+interface DegreeDetails {
+  id: number;
+  DegreeName: string;
+}
+
+interface CollegeDetails {
+  id: number;
   name: string;
-  dob: string;
-  address: string;
-  collegeName: string;
-  university: string;
-  usn: string;
-  verificationType: string;
-  verificationId: string;
-  gender: string;
-  branch: string;
-  semester: string;
-  phoneNumber: string;
+  code: string;
+  Active_Status: string;
 }
 
-interface LoginData {
-  IIMSTC_ID: string;
-  password: string;
+interface DegreeStatusDetails {
+  DegreeStatusID: number;
+  StatusName: string;
+  degreeId: number;
 }
 
-export const registerUser = async (data: RegisterData) => {
-  try {
-    const response = await axios.post(`${API_URL}/register`, data);
-    return response;
-  } catch (error) {
-    console.error('Error during registration:', error);
-    throw error;
-  }
-};
-
-export const loginUser = async (data: LoginData) => {
-  try {
-    const response = await axios.post(`${API_URL}/login`, data);
-    
-    if (response.data && response.data.token && response.data.user && response.data.user.IIMSTC_ID) {
-      localStorage.setItem('token', response.data.token); // Store token in localStorage
-      localStorage.setItem('IIMSTC_ID', response.data.user.IIMSTC_ID); // Store IIMSTC_ID in localStorage
-      return response.data.user;
-    } else {
-      console.error('Login failed: Response data is missing token or IIMSTC_ID', response.data);
-      throw new Error('Login failed: No token or IIMSTC_ID returned');
-    }
-  } catch (error) {
-    console.error('Error during login request:', error);
-    throw error;
-  }
-};
-
+interface BranchDetails {
+  BranchID: number;
+  BranchName: string;
+  degreeId: number;
+}
 
 export interface UserProfile {
-  id: string; 
-  name: string;
-  IIMSTC_ID: string; // Use IIMSTC_ID instead of email
+  id: string;
+  IIMSTC_ID: any;
+  email: string;
   dob: string;
   address: string;
-  collegeName: string;
-  university: string;
-  usn: string;
-  verificationType: string;
-  verificationId: string;
-  gender: string;
-  branch: string;
-  semester: string;
+  name: string;
   phoneNumber: string;
-  passportPhoto?: File | null; // Allow null
+  collegeId: number;
+  branchId: number;
+  semester: string;
+  usn: string;
+  aadharNo: string;
+  gender: string;
+  degreeId: number;
+  degreeStatusId: number;
+  university: string;
+  passportPhoto: File | { type: 'Buffer'; data: number[] } | null;
+  degreeDetails: DegreeDetails;
+  collegeDetails: CollegeDetails;
+  degreeStatusDetails: DegreeStatusDetails;
+  branchDetails: BranchDetails;
 }
+
 
 export const fetchUserProfile = async () => {
   const token = localStorage.getItem('token');
@@ -139,5 +216,10 @@ export default {
   loginUser,
   fetchUserProfile,
   updateUserProfile,
-  fetchUserDetails
+  fetchUserDetails,
+  fetchColleges,
+  fetchDegrees,
+  fetchBranches,
+  fetchDegreeStatuses,
+  
 };

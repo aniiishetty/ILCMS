@@ -99,7 +99,7 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
                   id="email"
                   type="email"
                   name="email"
-                  value={editProfile?.IIMSTC_ID || ''}
+                  value={editProfile?.email || ''}
                   onChange={handleChange}
                   placeholder="Email"
                   className="input text-black"
@@ -136,11 +136,11 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
               </div>
 
               <div className="inputGroup">
-                <label className="label" htmlFor="fullName">Full Name:</label>
+                <label className="label" htmlFor="name">Full Name:</label>
                 <input
-                  id="fullName"
+                  id="name"
                   type="text"
-                  name="fullName"
+                  name="name"
                   value={editProfile?.name || ''}
                   onChange={handleChange}
                   placeholder="Full Name"
@@ -164,12 +164,12 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
               </div>
 
               <div className="inputGroup">
-                <label className="label" htmlFor="collegeName">College Name:</label>
+                <label className="label" htmlFor="collegeId">College Name:</label>
                 <input
-                  id="collegeName"
+                  id="collegeId"
                   type="text"
-                  name="collegeName"
-                  value={editProfile?.collegeName || ''}
+                  name="collegeId"
+                  value={editProfile?.collegeId || ''}
                   onChange={handleChange}
                   placeholder="College Name"
                   className="input text-black"
@@ -178,12 +178,12 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
               </div>
 
               <div className="inputGroup">
-                <label className="label" htmlFor="branch">Branch:</label>
+                <label className="label" htmlFor="branchId">Branch:</label>
                 <input
-                  id="branch"
+                  id="branchId"
                   type="text"
-                  name="branch"
-                  value={editProfile?.branch || ''}
+                  name="branchId"
+                  value={editProfile?.branchId || ''}
                   onChange={handleChange}
                   placeholder="Branch"
                   className="input text-black"
@@ -220,79 +220,164 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({
               </div>
 
               <div className="inputGroup">
-                <label className="label" htmlFor="verificationType">Verification Type:</label>
+                <label className="label" htmlFor="aadharNo">Aadhar Number:</label>
                 <input
-                  id="verificationType"
+                  id="aadharNo"
                   type="text"
-                  name="verificationType"
-                  value={editProfile?.verificationType || ''}
+                  name="aadharNo"
+                  value={editProfile?.aadharNo || ''}
                   onChange={handleChange}
-                  placeholder="Verification Type"
+                  placeholder="Aadhar Number"
                   className="input text-black"
-                  aria-label="Verification Type"
+                  aria-label="Aadhar Number"
                 />
               </div>
+
+              <div className="inputGroup">
+                <label className="label" htmlFor="gender">Gender:</label>
+                <input
+                  id="gender"
+                  type="text"
+                  name="gender"
+                  value={editProfile?.gender || ''}
+                  onChange={handleChange}
+                  placeholder="Gender"
+                  className="input text-black"
+                  aria-label="Gender"
+                />
+              </div>
+
+              <div className="inputGroup">
+                <label className="label" htmlFor="degreeId">Degree:</label>
+                <input
+                  id="degreeId"
+                  type="text"
+                  name="degreeId"
+                  value={editProfile?.degreeId || ''}
+                  onChange={handleChange}
+                  placeholder="Degree ID"
+                  className="input text-black"
+                  aria-label="Degree ID"
+                />
+              </div>
+
+              <div className="inputGroup">
+                <label className="label" htmlFor="degreeStatusId">Degree Status:</label>
+                <input
+                  id="degreeStatusId"
+                  type="text"
+                  name="degreeStatusId"
+                  value={editProfile?.degreeStatusId || ''}
+                  onChange={handleChange}
+                  placeholder="Degree Status ID"
+                  className="input text-black"
+                  aria-label="Degree Status ID"
+                />
+              </div>
+
+              <div className="inputGroup">
+                <label className="label" htmlFor="passportPhoto"> Photo:</label>
+                <input
+                  id="passportPhoto"
+                  type="file"
+                  name="passportPhoto"
+                  onChange={handleChange}
+                  className="input text-black"
+                  aria-label="Passport Photo"
+                />
+              </div>
+
+              <div className="inputGroup">
+                <label className="label">Current Photo:</label>
+                {renderPassportPhoto(editProfile?.passportPhoto)}
+              </div>
             </div>
-            <button onClick={handleSave} className="saveButton">Save</button>
+
+            <div className="btnContainer">
+              <button onClick={handleSave} className="saveBtn">Save</button>
+            </div>
           </div>
         ) : (
           <div className="space-y-4">
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-              <div className="inputGroup">
-                <span className="label">Email:</span>
-                <span className="value">{currentProfile.IIMSTC_ID}</span>
+              <div className="infoGroup">
+                <label className="label">Email:</label>
+                <span className="info">{currentProfile.email}</span>
               </div>
 
-              <div className="inputGroup">
-                <span className="label">Date of Birth:</span>
-                <span className="value">{currentProfile.dob ? formatDate(currentProfile.dob) : ''}</span>
+              <div className="infoGroup">
+                <label className="label">Date of Birth:</label>
+                <span className="info">{formatDate(currentProfile.dob)}</span>
               </div>
 
-              <div className="inputGroup">
-                <span className="label">Address:</span>
-                <span className="value">{currentProfile.address}</span>
+              <div className="infoGroup">
+                <label className="label">Address:</label>
+                <span className="info">{currentProfile.address}</span>
               </div>
 
-              <div className="inputGroup">
-                <span className="label">Full Name:</span>
-                <span className="value">{currentProfile.name}</span>
+              <div className="infoGroup">
+                <label className="label">Full Name:</label>
+                <span className="info">{currentProfile.name}</span>
               </div>
 
-              <div className="inputGroup">
-                <span className="label">Phone Number:</span>
-                <span className="value">{currentProfile.phoneNumber}</span>
+              <div className="infoGroup">
+                <label className="label">Phone Number:</label>
+                <span className="info">{currentProfile.phoneNumber}</span>
               </div>
 
-              <div className="inputGroup">
-                <span className="label">College Name:</span>
-                <span className="value">{currentProfile.collegeName}</span>
+              <div className="infoGroup">
+                <label className="label">College Name:</label>
+                <span className="info">{currentProfile.collegeDetails?.name || ''}</span>
               </div>
 
-              <div className="inputGroup">
-                <span className="label">Branch:</span>
-                <span className="value">{currentProfile.branch}</span>
+              <div className="infoGroup">
+                <label className="label">Branch:</label>
+                <span className="info">{currentProfile.branchDetails?.BranchName || ''}</span>
               </div>
 
-              <div className="inputGroup">
-                <span className="label">Semester:</span>
-                <span className="value">{currentProfile.semester}</span>
+              <div className="infoGroup">
+                <label className="label">Semester:</label>
+                <span className="info">{currentProfile.semester}</span>
               </div>
 
-              <div className="inputGroup">
-                <span className="label">USN:</span>
-                <span className="value">{currentProfile.usn}</span>
+              <div className="infoGroup">
+                <label className="label">USN:</label>
+                <span className="info">{currentProfile.usn}</span>
               </div>
 
-              <div className="inputGroup">
-                <span className="label">Verification Type:</span>
-                <span className="value">{currentProfile.verificationType}</span>
+              <div className="infoGroup">
+                <label className="label">Aadhar Number:</label>
+                <span className="info">{currentProfile.aadharNo}</span>
+              </div>
+
+              <div className="infoGroup">
+                <label className="label">Gender:</label>
+                <span className="info">{currentProfile.gender}</span>
+              </div>
+
+              <div className="infoGroup">
+                <label className="label">Degree:</label>
+                <span className="info">{currentProfile.degreeDetails?.DegreeName || ''}</span>
+              </div>
+
+              <div className="infoGroup">
+                <label className="label">Degree Status:</label>
+                <span className="info">{currentProfile.degreeStatusDetails?.StatusName || ''}</span>
+              </div>
+
+              <div className="infoGroup">
+                <label className="label">Passport Photo:</label>
+                {renderPassportPhoto(currentProfile.passportPhoto)}
               </div>
             </div>
-            <button onClick={handleEdit} className="editButton">Edit</button>
+
+            <div className="btnContainer">
+              <button onClick={handleEdit} className="editBtn">Edit</button>
+            </div>
           </div>
         )
       ) : (
-        <div>Loading...</div>
+        <p>Loading...</p>
       )}
     </div>
   );

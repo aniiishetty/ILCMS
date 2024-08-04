@@ -9,6 +9,8 @@ import path from 'path';
 import studentPhotoRoutes from './routes/studentPhotoRoutes';
 import aicteInternRoutes from './routes/aicteInternRoutes';
 import dailyLogRoutes from './routes/dailyLogRoutes';
+import collegeRoutes from './routes/collegeRoutes';
+import degreeRoutes from './routes/degreeRoutes'
 import fileUpload from 'express-fileupload';
 
 
@@ -39,6 +41,8 @@ app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/photos', studentPhotoRoutes);
 app.use('/api/aicte-interns', aicteInternRoutes);
+app.use('/api/college', collegeRoutes);
+app.use('/api/degree', degreeRoutes);
 
 app.listen(port, async () => {
   console.log(`Server running on port ${port}`);
