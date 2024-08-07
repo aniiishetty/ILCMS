@@ -27,6 +27,7 @@ interface UserAttributes {
   degreeStatusId: number;
   branchId: number;
   otp?: string | null;
+  InternshipApproved: boolean | null; 
 }
 
 interface UserCreationAttributes extends Optional<UserAttributes, 'id' | 'otp'> {}
@@ -53,6 +54,7 @@ class User extends Model<UserAttributes, UserCreationAttributes> implements User
   public degreeStatusId!: number;
   public branchId!: number;
   public otp!:string;
+  public InternshipApproved!: boolean;
 
   static associate(models: any) {
     User.hasOne(models.AicteIntern, { foreignKey: 'userId', as: 'aicteInterns' });
@@ -143,6 +145,11 @@ User.init(
       type: DataTypes.STRING, // Store OTP as a string
       allowNull: true, // Allow null when not in use
     },
+    InternshipApproved: {
+      type: DataTypes.BOOLEAN,
+      allowNull: true,
+      
+  },
   },
   {
     sequelize,

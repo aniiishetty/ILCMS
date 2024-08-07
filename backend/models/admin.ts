@@ -1,48 +1,48 @@
-// models/Admin.ts
-import { DataTypes, Model, Optional } from 'sequelize';
+// backend/models/Admin.ts
+import { DataTypes, Model } from 'sequelize';
+import bcrypt from 'bcrypt';
 import sequelize from '../config/database';
+import Role from './Role';
 
-interface AdminAttributes {
-  id: number;
-  Username: string;
-  password: string;
+class Admin extends Model {
+    public id!: number;
+    public username!: string;
+    public password!: string;
+    public roleId!: number;
+    public readonly createdAt!: Date;
+    public readonly updatedAt!: Date;
+
 }
 
-interface AdminCreationAttributes extends Optional<AdminAttributes, 'id'> {}
-
-class Admin extends Model<AdminAttributes, AdminCreationAttributes> implements AdminAttributes {
-  public id!: number;
-  public Username!: string;
-  public password!: string;
-}
-
-Admin.init(
-  {
+Admin.init({
     id: {
-      type: DataTypes.INTEGER,
-      autoIncrement: true,
-      primaryKey: true,
+        type: DataTypes.INTEGER.UNSIGNED,
+        autoIncrement: true,
+        primaryKey: true,
     },
-    Username: {
-      type: DataTypes.STRING,
-      allowNull: false,
+    username: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        unique: true,
     },
     password: {
-      type: DataTypes.STRING,
-      allowNull: false,
+        type: DataTypes.STRING,
+        allowNull: false,
     },
-  },
-  {
+    roleId: {
+        type: DataTypes.INTEGER.UNSIGNED,
+        references: {
+            model: Role,
+            key: 'id',
+        },
+        allowNull: false,
+    },
+}, {
     sequelize,
     tableName: 'admins',
-    timestamps: true, // Add timestamps to keep track of record creation and updates
-    indexes: [
-      {
-        unique: true,
-        fields: ['Username'] // Create a composite index on Username and email columns
-      }
-    ]
-  }
-);
+    timestamps: true, // Automatically adds createdAt and updatedAt fields
+});
 
-export { Admin };
+
+
+export default Admin;

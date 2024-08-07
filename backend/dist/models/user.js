@@ -99,6 +99,10 @@ User.init({
         type: sequelize_1.DataTypes.STRING, // Store OTP as a string
         allowNull: true, // Allow null when not in use
     },
+    InternshipApproved: {
+        type: sequelize_1.DataTypes.BOOLEAN,
+        allowNull: true,
+    },
 }, {
     sequelize: database_1.default,
     tableName: 'users',

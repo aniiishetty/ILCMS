@@ -12,10 +12,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.DegreeStatus = exports.BranchModel = exports.Degree = exports.InternshipModel = exports.College = exports.AicteIntern = exports.StudentPhoto = exports.User = exports.Admin = exports.connectDB = void 0;
+exports.DailyLog = exports.PreScreening = exports.Payment = exports.Admin = exports.Role = exports.DegreeStatus = exports.BranchModel = exports.Degree = exports.InternshipModel = exports.College = exports.AicteIntern = exports.StudentPhoto = exports.User = exports.connectDB = void 0;
 const database_1 = __importDefault(require("../config/database"));
-const admin_1 = require("./admin");
-Object.defineProperty(exports, "Admin", { enumerable: true, get: function () { return admin_1.Admin; } });
 const user_1 = require("./user");
 Object.defineProperty(exports, "User", { enumerable: true, get: function () { return user_1.User; } });
 const studentPhoto_1 = require("./studentPhoto");
@@ -32,6 +30,16 @@ const BranchModel_1 = require("./BranchModel");
 Object.defineProperty(exports, "BranchModel", { enumerable: true, get: function () { return BranchModel_1.BranchModel; } });
 const DegreeStatus_1 = require("./DegreeStatus");
 Object.defineProperty(exports, "DegreeStatus", { enumerable: true, get: function () { return DegreeStatus_1.DegreeStatus; } });
+const Role_1 = __importDefault(require("./Role"));
+exports.Role = Role_1.default;
+const Admin_1 = __importDefault(require("./Admin"));
+exports.Admin = Admin_1.default;
+const payment_1 = require("./payment");
+Object.defineProperty(exports, "Payment", { enumerable: true, get: function () { return payment_1.Payment; } });
+const PreScreening_1 = require("./PreScreening");
+Object.defineProperty(exports, "PreScreening", { enumerable: true, get: function () { return PreScreening_1.PreScreening; } });
+const dailyLog_1 = require("./dailyLog");
+Object.defineProperty(exports, "DailyLog", { enumerable: true, get: function () { return dailyLog_1.DailyLog; } });
 // Initialize models
 // Initialize models
 const connectDB = () => __awaiter(void 0, void 0, void 0, function* () {

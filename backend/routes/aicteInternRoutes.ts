@@ -5,10 +5,10 @@ import { createAicteIntern, getAicteInternById } from '../controllers/aicteInter
 const router = express.Router();
 
 // Setup multer for handling file uploads
-const upload = multer({ storage: multer.memoryStorage() });
+const upload = multer({ });
 
 // Route to handle AICTE Intern form submission
-router.post('/create', upload.single('resume'), createAicteIntern);
+router.post('/create', createAicteIntern);
 router.get('/:id', getAicteInternById);
 
 export default router;

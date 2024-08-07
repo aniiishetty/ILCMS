@@ -1,6 +1,5 @@
 import { DataTypes, Model, Optional } from 'sequelize';
 import sequelize from '../config/database';
-import { AicteIntern } from './aicteIntern';
 
 interface DailyLogAttributes {
   id: number;
@@ -14,13 +13,22 @@ interface DailyLogAttributes {
   hodName: string;
   hodEmail: string;
   mainPoints: string;
-  userId: number; // Foreign key to User
+  userId?: number; // Foreign key to User
   aicteInternId?: number; // Optional foreign key to AicteIntern
 }
 
 interface DailyLogCreationAttributes extends Optional<DailyLogAttributes, 'id' | 'aicteInternId'> {}
 
 class DailyLog extends Model<DailyLogAttributes, DailyLogCreationAttributes> implements DailyLogAttributes {
+  static find(p0: { user: string; }) {
+    throw new Error('Method not implemented.');
+  }
+  static findByIdAndUpdate(id: string, arg1: { day: any; date: any; arrivalTime: any; departureTime: any; remarks: any; department: any; finishedProduct: any; hodName: any; hodEmail: any; mainPoints: any; }, arg2: { new: boolean; }) {
+    throw new Error('Method not implemented.');
+  }
+  static findByIdAndRemove(id: string) {
+    throw new Error('Method not implemented.');
+  }
   public id!: number;
   public day!: string;
   public date!: Date;
@@ -32,11 +40,13 @@ class DailyLog extends Model<DailyLogAttributes, DailyLogCreationAttributes> imp
   public hodName!: string;
   public hodEmail!: string;
   public mainPoints!: string;
-  public userId!: number;
+  public userId?: number;
   public aicteInternId?: number;
 
   // Define associations
   static associate(models: any) {
+    DailyLog.hasOne(models.User, { foreignKey: 'userId', as: 'user' });
+    DailyLog.hasOne(models.AicteIntern, { foreignKey: 'aicteInternId', as: 'aicteIntern' });
     DailyLog.belongsTo(models.User, { foreignKey: 'userId', as: 'user' });
     DailyLog.belongsTo(models.AicteIntern, { foreignKey: 'aicteInternId', as: 'aicteIntern' });
   }
@@ -91,7 +101,7 @@ DailyLog.init(
     },
     userId: {
       type: DataTypes.INTEGER,
-      allowNull: false,
+      allowNull: true,
     },
     aicteInternId: {
       type: DataTypes.INTEGER,

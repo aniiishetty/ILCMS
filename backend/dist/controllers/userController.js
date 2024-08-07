@@ -23,7 +23,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.verifyOTP = exports.updateUserProfile = exports.fetchUserProfile = exports.loginUser = exports.registerUser = void 0;
+exports.verifyOTP = exports.updateUserProfile = exports.fetchUserProfile = exports.loginUser = exports.registerUser = exports.getUserById = exports.getAllUsers = exports.getCurrentUserByIIMSTC_ID = void 0;
 const user_1 = require("../models/user");
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const crypto_1 = __importDefault(require("crypto"));
@@ -108,7 +108,8 @@ const registerUser = (req, res) => __awaiter(void 0, void 0, void 0, function* (
             aadharNo,
             passportPhoto,
             aadharProof,
-            otp, // Store OTP
+            otp,
+            InternshipApproved: false, // Store OTP
         });
         // Send OTP email
         const mailOptions = {
@@ -158,6 +159,7 @@ const verifyOTP = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
 });
 exports.verifyOTP = verifyOTP;
 // Login user
+// Login user
 const loginUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { IIMSTC_ID, password } = req.body;
@@ -174,14 +176,15 @@ const loginUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             return res.status(400).json({ message: 'Invalid IIMSTC ID or password' });
         }
         // Generate a JWT token
-        const token = jsonwebtoken_1.default.sign({ IIMSTC_ID: user.IIMSTC_ID }, 'your_jwt_secret', { expiresIn: '1h' });
-        console.log('Generated JWT token for IIMSTC ID:', IIMSTC_ID, 'Token:', token);
+        const token = jsonwebtoken_1.default.sign({ IIMSTC_ID: user.IIMSTC_ID, degreeStatusId: user.degreeStatusId }, 'your_jwt_secret', { expiresIn: '1h' });
+        console.log('Generated JWT token for IIMSTC ID:', IIMSTC_ID, 'Token:', token, 'DegreeStatusId:', user.degreeStatusId);
         // Respond with user details (excluding password)
         const userDetails = {
             id: user.id,
             IIMSTC_ID: user.IIMSTC_ID,
             email: user.email,
             name: user.name,
+            degreeStatusId: user.degreeStatusId
         };
         return res.status(200).json({ message: 'Login successful', user: userDetails, token });
     }
@@ -293,3 +296,60 @@ const updateUserProfile = (req, res) => __awaiter(void 0, void 0, void 0, functi
     }
 });
 exports.updateUserProfile = updateUserProfile;
+const getCurrentUserByIIMSTC_ID = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { IIMSTC_ID } = req.query;
+        // Ensure IIMSTC_ID is a string
+        const iimstcId = Array.isArray(IIMSTC_ID) ? IIMSTC_ID[0] : IIMSTC_ID;
+        if (!iimstcId || typeof iimstcId !== 'string') {
+            return res.status(400).json({ error: 'Invalid or missing IIMSTC_ID' });
+        }
+        // Fetch user by IIMSTC_ID
+        const user = yield user_1.User.findOne({ where: { IIMSTC_ID: iimstcId } });
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+        res.status(200).json({ userId: user.id });
+    }
+    catch (error) {
+        console.error('Error fetching user by IIMSTC_ID:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+exports.getCurrentUserByIIMSTC_ID = getCurrentUserByIIMSTC_ID;
+const getAllUsers = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        // Fetch all users from the database
+        const users = yield user_1.User.findAll();
+        // Exclude passwords from the response
+        const userList = users.map(user => {
+            const _a = user.toJSON(), { password } = _a, userWithoutPassword = __rest(_a, ["password"]);
+            return userWithoutPassword;
+        });
+        // Return the list of users
+        res.status(200).json({ success: true, users: userList });
+    }
+    catch (error) {
+        // Log the error and return an error response
+        console.error('Error fetching all users:', error);
+        res.status(500).json({ success: false, error: 'Internal server error' });
+    }
+});
+exports.getAllUsers = getAllUsers;
+const getUserById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const userId = parseInt(req.params.id, 10);
+        const user = yield user_1.User.findByPk(userId);
+        if (user) {
+            res.json(user);
+        }
+        else {
+            res.status(404).json({ message: 'User not found' });
+        }
+    }
+    catch (error) {
+        console.error('Error fetching user:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+exports.getUserById = getUserById;

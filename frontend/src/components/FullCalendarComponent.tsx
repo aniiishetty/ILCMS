@@ -9,6 +9,7 @@ import '../styles/FullCalendarComponent.css';
 
 const FullCalendarComponent: React.FC = () => {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null); // Track the selected date
+  const [events, setEvents] = useState<Array<any>>([]); // Track calendar events
 
   const handleDateClick = (arg: any) => {
     const clickedDate = new Date(arg.dateStr);
@@ -48,6 +49,19 @@ const FullCalendarComponent: React.FC = () => {
     }
   };
 
+  const handleLogSubmit = (log: any) => {
+    // Add event to the state
+    setEvents(prevEvents => [
+      ...prevEvents,
+      {
+        title: 'Daily Log Submitted',
+        start: log.date, // Using the date from the submitted log
+        allDay: true
+      }
+    ]);
+    setSelectedDate(null); // Close the form after submission
+  };
+
   return (
     <div className="relative max-w-4xl mx-auto p-5 bg-gray-800 text-white rounded-lg shadow-lg">
       <h2 className="text-2xl mb-4">My Custom FullCalendar</h2>
@@ -61,21 +75,22 @@ const FullCalendarComponent: React.FC = () => {
         weekends={true}
         dateClick={handleDateClick}
         dayCellDidMount={dayCellDidMount}
+        events={events} // Pass the events to FullCalendar
         headerToolbar={{
           left: 'prev,next today',
           center: 'title',
           right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek',
         }}
-        events={[
-          // Define your events here
-        ]}
       />
       {/* Render DailyLogForm as an overlay if a date is selected */}
       {selectedDate && (
         <div className="absolute inset-0 flex items-center justify-center bg-gray-900 bg-opacity-80 z-10">
           <div className="bg-gray-800 p-6 rounded-lg shadow-lg max-w-lg w-full relative">
             <h3 className="text-xl mb-4 text-gray-200">Daily Log for {selectedDate.toDateString()}</h3>
-            <DailyLogForm aicteInternId={0} />
+            <DailyLogForm 
+              aicteInternId={0} 
+              onLogSubmit={handleLogSubmit} // Pass the handler function
+            />
             <button 
               onClick={() => setSelectedDate(null)} 
               className="absolute top-4 right-4 text-gray-300 hover:text-white">

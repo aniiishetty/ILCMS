@@ -19,8 +19,10 @@ router.post('/login', userController_1.loginUser);
 router.post('/verify-otp', userController_1.verifyOTP);
 // Route for fetching user profile
 router.post('/profile', userController_1.fetchUserProfile);
+router.get('/all', userController_1.getAllUsers);
 // Route for updating user profile with optional passport photo upload
 router.post('/update-profile', upload.fields([{ name: 'passportPhoto' }, { name: 'aadharProof' }]), userController_1.updateUserProfile);
+router.get('/current-user', userController_1.getCurrentUserByIIMSTC_ID);
 // Route for getting a user by ID
-//  router.get('/:id', getUserById);
+router.get('/:id', userController_1.getUserById);
 exports.default = router;

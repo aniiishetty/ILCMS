@@ -1,27 +1,12 @@
-import { Router } from 'express';
-import {
-  createDailyLog,
-  getAllDailyLogs,
-  getDailyLogById,
-  updateDailyLog,
-  deleteDailyLog
-} from '../controllers/dailyLogController';
+import express from 'express';
+import { getDailyLogs, getDailyLogsByUserId, createDailyLog, updateDailyLog, deleteDailyLog } from '../controllers/dailyLogController';
 
-const router = Router();
+const router = express.Router();
 
-// Route to create a new daily log
-router.post('/', createDailyLog);
-
-// Route to get all daily logs
-router.get('/', getAllDailyLogs);
-
-// Route to get a daily log by ID
-router.get('/:id', getDailyLogById);
-
-// Route to update a daily log by ID
+router.get('/all', getDailyLogs); // Ensure correct method name
+router.get('/user/:userId', getDailyLogsByUserId); // Ensure correct method name
+router.post('/user', createDailyLog);
 router.put('/:id', updateDailyLog);
-
-// Route to delete a daily log by ID
 router.delete('/:id', deleteDailyLog);
 
 export default router;

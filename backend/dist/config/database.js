@@ -23,6 +23,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.sequelize = void 0;
 // src/config/database.ts
 const sequelize_1 = require("sequelize");
 const dotenv = __importStar(require("dotenv"));
@@ -33,4 +34,5 @@ const sequelize = new sequelize_1.Sequelize(process.env.DB_NAME, process.env.DB_
     dialect: 'mysql',
     logging: false,
 });
+exports.sequelize = sequelize;
 exports.default = sequelize;

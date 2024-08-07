@@ -120,7 +120,8 @@ const registerUser = async (req: Request, res: Response) => {
       aadharNo,
       passportPhoto,
       aadharProof,
-      otp, // Store OTP
+      otp,
+      InternshipApproved: false,  // Store OTP
     });
 
     // Send OTP email
@@ -179,6 +180,7 @@ const verifyOTP = async (req: Request, res: Response) => {
 };
 
 // Login user
+// Login user
 const loginUser = async (req: Request, res: Response) => {
   try {
     const { IIMSTC_ID, password } = req.body;
@@ -198,8 +200,8 @@ const loginUser = async (req: Request, res: Response) => {
     }
 
     // Generate a JWT token
-    const token = jwt.sign({ IIMSTC_ID: user.IIMSTC_ID }, 'your_jwt_secret', { expiresIn: '1h' });
-    console.log('Generated JWT token for IIMSTC ID:', IIMSTC_ID, 'Token:', token);
+    const token = jwt.sign({ IIMSTC_ID: user.IIMSTC_ID, degreeStatusId: user.degreeStatusId }, 'your_jwt_secret', { expiresIn: '1h' });
+    console.log('Generated JWT token for IIMSTC ID:', IIMSTC_ID, 'Token:', token, 'DegreeStatusId:', user.degreeStatusId);
 
     // Respond with user details (excluding password)
     const userDetails = {
@@ -207,7 +209,7 @@ const loginUser = async (req: Request, res: Response) => {
       IIMSTC_ID: user.IIMSTC_ID,
       email: user.email,
       name: user.name,
-      
+      degreeStatusId: user.degreeStatusId
     };
 
     return res.status(200).json({ message: 'Login successful', user: userDetails, token });
@@ -216,6 +218,7 @@ const loginUser = async (req: Request, res: Response) => {
     return res.status(500).json({ message: 'Internal server error' });
   }
 };
+
 
 // Fetch user profile by IIMSTC_ID
 const fetchUserProfile = async (req: Request, res: Response) => {
@@ -328,6 +331,66 @@ const updateUserProfile = async (req: Request, res: Response) => {
     }
   }
 };
+export const getCurrentUserByIIMSTC_ID = async (req: Request, res: Response) => {
+  try {
+    const { IIMSTC_ID } = req.query;
+
+    // Ensure IIMSTC_ID is a string
+    const iimstcId = Array.isArray(IIMSTC_ID) ? IIMSTC_ID[0] : IIMSTC_ID;
+
+    if (!iimstcId || typeof iimstcId !== 'string') {
+      return res.status(400).json({ error: 'Invalid or missing IIMSTC_ID' });
+    }
+
+    // Fetch user by IIMSTC_ID
+    const user = await User.findOne({ where: { IIMSTC_ID: iimstcId } });
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    res.status(200).json({ userId: user.id });
+  } catch (error) {
+    console.error('Error fetching user by IIMSTC_ID:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+export const getAllUsers = async (req: Request, res: Response) => {
+  try {
+    // Fetch all users from the database
+    const users = await User.findAll();
+
+    // Exclude passwords from the response
+    const userList = users.map(user => {
+      const { password, ...userWithoutPassword } = user.toJSON();
+      return userWithoutPassword;
+    });
+
+    // Return the list of users
+    res.status(200).json({ success: true, users: userList });
+  } catch (error) {
+    // Log the error and return an error response
+    console.error('Error fetching all users:', error);
+    res.status(500).json({ success: false, error: 'Internal server error' });
+  }
+};
+export const getUserById = async (req: Request, res: Response) => {
+  try {
+    const userId = parseInt(req.params.id, 10);
+    const user = await User.findByPk(userId);
+
+    if (user) {
+      res.json(user);
+    } else {
+      res.status(404).json({ message: 'User not found' });
+    }
+  } catch (error) {
+    console.error('Error fetching user:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
+
 
 
 export { registerUser, loginUser, fetchUserProfile, updateUserProfile, verifyOTP };

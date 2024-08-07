@@ -4,10 +4,11 @@ import { fetchUserDetails } from '../services/userService';
 
 interface AICTEProps {
   id?: number; // ID for editing an existing record
-  userId: number; // User ID for fetching common fields
+  userId: number;
+  onSubmit: () => void; // Callback function to be called after submission
 }
 
-const AICTE: React.FC<AICTEProps> = ({ id, userId }) => {
+const AICTE: React.FC<AICTEProps> = ({ id, userId, onSubmit }) => {
   const [formData, setFormData] = useState<any>({
     email: '',
     phoneNumber: '',
@@ -50,10 +51,10 @@ const AICTE: React.FC<AICTEProps> = ({ id, userId }) => {
           phoneNumber: userData.phoneNumber || prevData.phoneNumber,
           fullName: userData.name || prevData.fullName,
           homeAddress: userData.address || prevData.homeAddress,
-          academicConcentration:userData.branch || prevData.academicConcentration,
-          rollNumber:userData.usn || prevData.rollNumber,
-          semester:userData.semester || prevData.semester,
-          schoolName:userData.collegeName || prevData.schoolName
+          academicConcentration: userData.branch || prevData.academicConcentration,
+          rollNumber: userData.usn || prevData.rollNumber,
+          semester: userData.semester || prevData.semester,
+          schoolName: userData.collegeName || prevData.schoolName
           // Add any other common fields here
         }));
       } catch (error) {
@@ -85,6 +86,7 @@ const AICTE: React.FC<AICTEProps> = ({ id, userId }) => {
         await createAicteIntern(formData);
         alert('AicteIntern record created successfully!');
       }
+      onSubmit(); // Call onSubmit after successful creation or update
     } catch (error) {
       console.error('Error submitting form:', error);
     }
@@ -393,7 +395,7 @@ const AICTE: React.FC<AICTEProps> = ({ id, userId }) => {
         </form>
       </div>
     </div>
-  );
+  );    
 };
 
 export default AICTE;

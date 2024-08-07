@@ -1,14 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { createDailyLog } from '../services/dailyLogService';
 import { getAicteInternById } from '../services/aicteInternService';
 
 interface DailyLogsProps {
   id?: number; // ID for editing an existing record
-  aicteInternId: number; // User ID for fetching common fields // The selected date passed from FullCalendarComponent
+  aicteInternId: number; // User ID for fetching common fields
+  onLogSubmit: (log: any) => void; // Callback for log submission
 }
 
-const DailyLogForm: React.FC<DailyLogsProps> = ({ aicteInternId, }) => {
+const DailyLogForm: React.FC<DailyLogsProps> = ({ aicteInternId, onLogSubmit }) => {
   const [log, setLog] = useState({
     day: '',
     date: '',
@@ -66,7 +67,7 @@ const DailyLogForm: React.FC<DailyLogsProps> = ({ aicteInternId, }) => {
     e.preventDefault();
     try {
       await createDailyLog(log);
-      navigate('/user');
+      onLogSubmit(log); // Notify parent component
     } catch (error) {
       console.error('Error submitting daily log:', error);
     }

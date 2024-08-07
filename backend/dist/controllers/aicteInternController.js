@@ -13,9 +13,10 @@ exports.getAicteInternById = exports.createAicteIntern = void 0;
 const aicteIntern_1 = require("../models/aicteIntern");
 // Create a new AICTE Intern
 const createAicteIntern = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a, _b;
     try {
         const { email, phoneNumber, fullName, homeAddress, rollNumber, academicConcentration, overallGPA, semester, academicYear, schoolName, schoolCityState, campusAddress, campusPhoneNumber, campusFaxNumber, schoolEmail, hodName, hodEmail, internshipPreferences, learningObjectives, technicalSkills, internshipActivities, evidenceToFaculty, userId, } = req.body;
-        const resume = req.file ? req.file.buffer : null;
+        const resume = ((_b = (_a = req.files) === null || _a === void 0 ? void 0 : _a.resume) === null || _b === void 0 ? void 0 : _b.data) || null;
         const aicteIntern = yield aicteIntern_1.AicteIntern.create({
             email,
             phoneNumber,

@@ -1,6 +1,5 @@
 import { Sequelize } from 'sequelize';
 import sequelize from '../config/database';
-import { Admin } from './admin';
 import { User } from './user';
 import { StudentPhoto } from './studentPhoto';
 import { AicteIntern } from './aicteIntern';
@@ -9,6 +8,11 @@ import { InternshipModel } from './InternshipModel';
 import { Degree } from './Degree';
 import { BranchModel } from './BranchModel';
 import { DegreeStatus } from './DegreeStatus';
+import Role from './Role';
+import Admin from './Admin';
+import { Payment } from './payment';
+import { PreScreening } from './PreScreening';
+import { DailyLog } from './dailyLog';
 
 // Initialize models
 // Initialize models
@@ -21,6 +25,11 @@ const connectDB = async () => {
     // Define model associations
     User.hasOne(AicteIntern, { foreignKey: 'userId', as: 'aicteIntern' });
     AicteIntern.belongsTo(User, { foreignKey: 'userId', as: 'user' });
+  
+
+    
+   
+    
 
    
    
@@ -33,4 +42,4 @@ const connectDB = async () => {
   }
 };
 // Exporting the connection function and models
-export { connectDB, Admin, User, StudentPhoto, AicteIntern, College, InternshipModel, Degree, BranchModel, DegreeStatus };
+export { connectDB, User, StudentPhoto, AicteIntern, College, InternshipModel, Degree, BranchModel, DegreeStatus, Role, Admin, Payment,PreScreening,DailyLog };

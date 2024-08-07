@@ -2,14 +2,16 @@ import axios from 'axios';
 
 const API_URL = 'http://localhost:5000/api/users';
 
+// Function to log in a user
 export const loginUser = async (loginData: { IIMSTC_ID: string; password: string }) => {
   try {
     const response = await axios.post(`${API_URL}/login`, loginData);
     const { token, user } = response.data;
 
-    // Store token and IIMSTC_ID in localStorage
+    // Store token and user details in localStorage
     localStorage.setItem('token', token);
     localStorage.setItem('IIMSTC_ID', user.IIMSTC_ID);
+    localStorage.setItem('degreeStatusId', user.degreeStatusId);
 
     return response.data;
   } catch (error) {
@@ -17,15 +19,19 @@ export const loginUser = async (loginData: { IIMSTC_ID: string; password: string
     throw error;
   }
 };
+
+// Function to verify OTP
 export const verifyOTP = async (otpData: { email: string; otp: string }) => {
   try {
     const response = await axios.post(`${API_URL}/verify-otp`, otpData);
     return response.data;
   } catch (error) {
+    console.error('Error verifying OTP:', error);
     throw error;
   }
 };
 
+// Function to register a new user
 export const registerUser = async (formData: FormData) => {
   try {
     const response = await axios.post(`${API_URL}/register`, formData);
@@ -35,15 +41,19 @@ export const registerUser = async (formData: FormData) => {
     throw error;
   }
 };
+
+// Fetch all colleges
 export const fetchColleges = async () => {
   try {
-    const response = await axios.get(`http://localhost:5000/api/college/colleges`);
+    const response = await axios.get('http://localhost:5000/api/college/colleges');
     return response.data;
   } catch (error) {
     console.error('Error fetching colleges:', error);
     throw error;
   }
 };
+
+// Fetch all degrees
 export const fetchDegrees = async () => {
   try {
     const response = await axios.get('http://localhost:5000/api/college/degrees');
@@ -54,6 +64,7 @@ export const fetchDegrees = async () => {
   }
 };
 
+// Fetch all branches
 export const fetchBranches = async () => {
   try {
     const response = await axios.get('http://localhost:5000/api/college/branches');
@@ -64,6 +75,7 @@ export const fetchBranches = async () => {
   }
 };
 
+// Fetch all degree statuses
 export const fetchDegreeStatuses = async () => {
   try {
     const response = await axios.get('http://localhost:5000/api/college/degree-statuses');
@@ -73,14 +85,16 @@ export const fetchDegreeStatuses = async () => {
     throw error;
   }
 };
+
+// Fetch degree statuses by degree ID
 export const fetchDegreeStatusesByDegree = async (degreeId: string) => {
   try {
-    const response = await axios.get(`http://localhost:5000/api/degree/degree-statuses`, {
+    const response = await axios.get('http://localhost:5000/api/degree/degree-statuses', {
       params: { degreeId }
     });
     return response.data;
   } catch (error) {
-    console.error('Error fetching degree statuses:', error);
+    console.error('Error fetching degree statuses by degree ID:', error);
     throw error;
   }
 };
@@ -88,16 +102,17 @@ export const fetchDegreeStatusesByDegree = async (degreeId: string) => {
 // Fetch branches by degree ID
 export const fetchBranchesByDegree = async (degreeId: string) => {
   try {
-    const response = await axios.get(`http://localhost:5000/api/degree/branches`, {
+    const response = await axios.get('http://localhost:5000/api/degree/branches', {
       params: { degreeId }
     });
     return response.data;
   } catch (error) {
-    console.error('Error fetching branches:', error);
+    console.error('Error fetching branches by degree ID:', error);
     throw error;
   }
 };
 
+// TypeScript interfaces for user profile details
 interface DegreeDetails {
   id: number;
   DegreeName: string;
@@ -124,7 +139,7 @@ interface BranchDetails {
 
 export interface UserProfile {
   id: string;
-  IIMSTC_ID: any;
+  IIMSTC_ID: string;
   email: string;
   dob: string;
   address: string;
@@ -146,18 +161,21 @@ export interface UserProfile {
   branchDetails: BranchDetails;
 }
 
-
+// Fetch user profile
 export const fetchUserProfile = async () => {
   const token = localStorage.getItem('token');
   const IIMSTC_ID = localStorage.getItem('IIMSTC_ID');
+  const degreeStatusId = localStorage.getItem('degreeStatusId');
+
   console.log('Token:', token); // Debug log
   console.log('IIMSTC_ID:', IIMSTC_ID); // Debug log
+  console.log('DegreeStatusId:', degreeStatusId); // Debug log
 
-  if (!token || !IIMSTC_ID) {
-    console.error('Token or IIMSTC_ID is missing from localStorage');
-    throw new Error('Token or IIMSTC_ID is missing from localStorage');
+  if (!token || !IIMSTC_ID || !degreeStatusId) {
+    console.error('Token, IIMSTC_ID, or degreeStatusId is missing from localStorage');
+    throw new Error('Token, IIMSTC_ID, or degreeStatusId is missing from localStorage');
   }
-  
+
   try {
     const response = await axios.post(`${API_URL}/profile`, { IIMSTC_ID }, {
       headers: {
@@ -176,6 +194,7 @@ export const fetchUserProfile = async () => {
   }
 };
 
+// Update user profile
 export const updateUserProfile = async (profile: UserProfile) => {
   const token = localStorage.getItem('token');
   const formData = new FormData();
@@ -201,6 +220,7 @@ export const updateUserProfile = async (profile: UserProfile) => {
   }
 };
 
+// Fetch user details by user ID
 export const fetchUserDetails = async (userId: number) => {
   try {
     const response = await axios.get(`${API_URL}/${userId}`);
@@ -221,5 +241,6 @@ export default {
   fetchDegrees,
   fetchBranches,
   fetchDegreeStatuses,
-  
+  fetchDegreeStatusesByDegree,
+  fetchBranchesByDegree,
 };

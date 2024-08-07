@@ -174,8 +174,11 @@ const User: React.FC = () => {
           localStorage.setItem('user', JSON.stringify(response.user));
           localStorage.setItem('token', response.token);
   
-          // Navigate to the user page
-          navigate('/user', { replace: true });
+          const degreeStatusId = response.user.degreeStatusId;
+          const navigateTo = [1, 3, 5, 7, 9].includes(degreeStatusId) ? '/user' :  '/sprint';
+  
+          // Navigate to the user or admin page
+          navigate(navigateTo, { replace: true });
         } else {
           setMessage('Login failed: Invalid credentials');
         }

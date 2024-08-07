@@ -6,12 +6,16 @@ import { CiLogout } from 'react-icons/ci';
 import { AiOutlineUser, AiOutlineClose } from 'react-icons/ai';
 import { MdAccountBox } from 'react-icons/md';
 import { IoMdHelpCircleOutline } from 'react-icons/io'; // Import the help icon
+import { FaTools } from 'react-icons/fa'; // Import the work in progress icon
 import InternshipProgram from '../components/InternshipProgram';
 import NormInternship from '../components/NormInternship'; // Import NormInternship component
 import AccountDetails from '../components/AccountDetails';
 import AICTE from '../components/AICTE'; // Import AicteInternForm component
 import PaymentComponent from '../components/PaymentComponent';
 import FullCalendarComponent from '../components/FullCalendarComponent'; // Import the FullCalendarComponent
+import axios from 'axios';
+import PreScreening from '../components/PreScreening'; // Import PreScreening component
+
 
 // Custom event type
 type CustomChangeEvent = React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLTextAreaElement> | { target: { name: string; value: string | File | null; } };
@@ -20,10 +24,12 @@ const TestAttendingMode = () => {
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [userId, setUserId] = useState<number | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [editProfile, setEditProfile] = useState<UserProfile | null>(null);
-  const [activeSection, setActiveSection] = useState<'account' | 'internshipProgram' | 'normInternship' | 'aicteIntern' | 'payment' | 'calendar'>('account');
+  const [activeSection, setActiveSection] = useState<'account' | 'internshipProgram' | 'normInternship' | 'aicteIntern' | 'payment' | 'calendar' | 'preScreening'>('account');
   const [isHelpOpen, setIsHelpOpen] = useState(false);
+  const [aicteFormSubmitted, setAicteFormSubmitted] = useState(false); // Add this state variable
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -51,6 +57,7 @@ const TestAttendingMode = () => {
 
     fetchProfile();
   }, []);
+  
 
   useEffect(() => {
     if (location.pathname.includes('normInternship')) {
@@ -86,8 +93,12 @@ const TestAttendingMode = () => {
     }
   };
 
-  const handleSidebarClick = (section: 'account' | 'internshipProgram' | 'normInternship' | 'aicteIntern' | 'payment' | 'calendar') => {
+  const handleSidebarClick = (section: 'account' | 'internshipProgram' | 'normInternship' | 'aicteIntern' | 'payment' | 'calendar' | 'preScreening') => {
     setActiveSection(section);
+  };
+
+  const handleAicteFormSubmit = () => {
+    setAicteFormSubmitted(true);
   };
 
   return (
@@ -125,11 +136,19 @@ const TestAttendingMode = () => {
             >
               <span>Research Internship Program</span>
             </button>
+            {aicteFormSubmitted && (
+              <button
+                onClick={() => handleSidebarClick('calendar')}
+                className={`w-full text-left p-2 mt-4 ${activeSection === 'calendar' ? 'bg-lime-700' : 'bg-lime-800'} hover:bg-lime-600 rounded-md`}
+              >
+                <span>Daily Logs</span>
+              </button>
+            )}
             <button
-              onClick={() => handleSidebarClick('calendar')}
-              className={`w-full text-left p-2 mt-4 ${activeSection === 'calendar' ? 'bg-lime-700' : 'bg-lime-800'} hover:bg-lime-600 rounded-md`}
+              onClick={() => handleSidebarClick('preScreening')}
+              className={`w-full text-left p-2 mt-4 ${activeSection === 'preScreening' ? 'bg-lime-700' : 'bg-lime-800'} hover:bg-lime-600 rounded-md`}
             >
-              <span>Daily Logs</span>
+              <span>Pre Screening Form</span>
             </button>
           </div>
           <div className="mt-auto">
@@ -165,7 +184,7 @@ const TestAttendingMode = () => {
               handleEdit={handleEdit}
             />
           )}
-          {activeSection === 'internshipProgram' && (
+                    {activeSection === 'internshipProgram' && (
             <div>
               <div className="flex justify-between items-center mb-6">
                 <h1 className="text-2xl font-bold text-black">Sprint Internship Program</h1>
@@ -196,14 +215,15 @@ const TestAttendingMode = () => {
             </>
           )}
           {activeSection === 'aicteIntern' && userProfile && (
-            <div className="flex justify-center">
-              <div className="w-full max-w-4xl"> {/* Increased max-width */}
-                <AICTE userId={Number(userProfile.id)} />
-              </div>
-            </div>
-          )}
+  <div className="flex justify-center">
+    <div className="w-full max-w-4xl">
+      <AICTE userId={Number(userProfile.id)} onSubmit={handleAicteFormSubmit} />
+    </div>
+  </div>
+)}
           {activeSection === 'payment' && <PaymentComponent />}
           {activeSection === 'calendar' && <FullCalendarComponent />}
+          {activeSection === 'preScreening' && <PreScreening />}
         </div>
       </div>
 

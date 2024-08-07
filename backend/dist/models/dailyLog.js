@@ -7,8 +7,19 @@ exports.DailyLog = void 0;
 const sequelize_1 = require("sequelize");
 const database_1 = __importDefault(require("../config/database"));
 class DailyLog extends sequelize_1.Model {
+    static find(p0) {
+        throw new Error('Method not implemented.');
+    }
+    static findByIdAndUpdate(id, arg1, arg2) {
+        throw new Error('Method not implemented.');
+    }
+    static findByIdAndRemove(id) {
+        throw new Error('Method not implemented.');
+    }
     // Define associations
     static associate(models) {
+        DailyLog.hasOne(models.User, { foreignKey: 'userId', as: 'user' });
+        DailyLog.hasOne(models.AicteIntern, { foreignKey: 'aicteInternId', as: 'aicteIntern' });
         DailyLog.belongsTo(models.User, { foreignKey: 'userId', as: 'user' });
         DailyLog.belongsTo(models.AicteIntern, { foreignKey: 'aicteInternId', as: 'aicteIntern' });
     }
@@ -62,7 +73,7 @@ DailyLog.init({
     },
     userId: {
         type: sequelize_1.DataTypes.INTEGER,
-        allowNull: false,
+        allowNull: true,
     },
     aicteInternId: {
         type: sequelize_1.DataTypes.INTEGER,

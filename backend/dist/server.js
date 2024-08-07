@@ -15,7 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const dotenv_1 = __importDefault(require("dotenv"));
 const cors_1 = __importDefault(require("cors")); // Import the cors package
-const authRoutes_1 = __importDefault(require("./routes/authRoutes"));
+const auth_1 = __importDefault(require("./routes/auth"));
 const userRoutes_1 = __importDefault(require("./routes/userRoutes"));
 const models_1 = require("./models");
 const body_parser_1 = __importDefault(require("body-parser"));
@@ -25,7 +25,12 @@ const aicteInternRoutes_1 = __importDefault(require("./routes/aicteInternRoutes"
 const dailyLogRoutes_1 = __importDefault(require("./routes/dailyLogRoutes"));
 const collegeRoutes_1 = __importDefault(require("./routes/collegeRoutes"));
 const degreeRoutes_1 = __importDefault(require("./routes/degreeRoutes"));
+const dashboard_1 = __importDefault(require("./routes/dashboard"));
 const express_fileupload_1 = __importDefault(require("express-fileupload"));
+const paymentRoutes_1 = __importDefault(require("./routes/paymentRoutes"));
+const preScreenRoutes_1 = __importDefault(require("./routes/preScreenRoutes"));
+const approvalRoutes_1 = __importDefault(require("./routes/approvalRoutes"));
+const verifyPaymentRoutes_1 = __importDefault(require("./routes/verifyPaymentRoutes"));
 dotenv_1.default.config();
 const app = (0, express_1.default)();
 const port = process.env.PORT || 5000;
@@ -46,12 +51,17 @@ app.use((0, express_fileupload_1.default)());
 // Remove or comment out the line serving the uploads directory if not needed
 // app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use('/api/daily-logs', dailyLogRoutes_1.default);
-app.use('/api/auth', authRoutes_1.default);
+app.use('/api/auth', auth_1.default);
 app.use('/api/users', userRoutes_1.default);
 app.use('/api/photos', studentPhotoRoutes_1.default);
 app.use('/api/aicte-interns', aicteInternRoutes_1.default);
 app.use('/api/college', collegeRoutes_1.default);
 app.use('/api/degree', degreeRoutes_1.default);
+app.use('/api/dashboard', dashboard_1.default);
+app.use('/api/payments', paymentRoutes_1.default);
+app.use('/api/prescreening', preScreenRoutes_1.default);
+app.use('/api/approval', approvalRoutes_1.default);
+app.use('/api/verify-payment', verifyPaymentRoutes_1.default);
 app.listen(port, () => __awaiter(void 0, void 0, void 0, function* () {
     console.log(`Server running on port ${port}`);
     yield (0, models_1.connectDB)();

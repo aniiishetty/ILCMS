@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { AicteIntern } from '../models/aicteIntern';
+import { UploadedFile } from 'express-fileupload';
 
 // Create a new AICTE Intern
 export const createAicteIntern = async (req: Request, res: Response) => {
@@ -30,7 +31,7 @@ export const createAicteIntern = async (req: Request, res: Response) => {
       userId,
     } = req.body;
 
-    const resume = req.file ? req.file.buffer : null;
+    const resume = (req.files as unknown as { [fieldname: string]: UploadedFile })?.resume?.data || null;
 
     const aicteIntern = await AicteIntern.create({
       email,

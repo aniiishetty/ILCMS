@@ -1,22 +1,62 @@
-// src/components/PaymentComponent.tsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 
-const PaymentComponent = () => {
+interface PaymentComponentProps {
+  // No need to pass userId as a prop; we'll fetch it
+}
+
+const PaymentComponent: React.FC<PaymentComponentProps> = () => {
   const [name, setName] = useState('');
   const [paymentMode, setPaymentMode] = useState('creditCard');
   const [utrNo, setUtrNo] = useState('');
   const [referenceFile, setReferenceFile] = useState<File | null>(null);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [userId, setUserId] = useState<number | null>(null); // State to store userId
 
-  const handleSubmit = (event: React.FormEvent) => {
+  useEffect(() => {
+    const fetchUserId = async () => {
+      try {
+        const IIMSTC_ID = localStorage.getItem('IIMSTC_ID'); // Retrieve IIMSTC_ID from local storage
+        if (IIMSTC_ID) {
+          const response = await axios.get(`/api/users/current-user?IIMSTC_ID=${IIMSTC_ID}`);
+          setUserId(response.data.userId); // Set userId from response
+        }
+      } catch (error) {
+        console.error('Error fetching user ID', error);
+      }
+    };
+
+    fetchUserId();
+  }, []);
+
+  const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    // Handle form submission here
-    console.log('Name:', name);
-    console.log('Payment Mode:', paymentMode);
-    console.log('UTR No:', utrNo);
-    console.log('Reference File:', referenceFile);
 
-    setIsSubmitted(true);
+    if (userId === null) {
+      console.error('User ID is not available');
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('name', name);
+    formData.append('paymentMode', paymentMode);
+    formData.append('utrNo', utrNo);
+    formData.append('userId', userId.toString()); // Include userId in form data
+    if (referenceFile) {
+      formData.append('referenceFile', referenceFile);
+    }
+
+    try {
+      const response = await axios.post('/api/payments/submit', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      console.log('Payment created successfully', response.data);
+      setIsSubmitted(true);
+    } catch (error) {
+      console.error('Error creating payment', error);
+    }
   };
 
   return (
